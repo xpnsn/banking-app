@@ -2,11 +2,13 @@ package com.safevault.accounts.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "accounts")
 public class Account {
 
@@ -24,7 +26,7 @@ public class Account {
     private String accountHolderName;
 
     @Column(nullable = false)
-    private double balance;
+    private Double balance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -33,4 +35,16 @@ public class Account {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private String password;
+
+    public Account(Long mobileNumber, String username, String accountHolderName, AccountType accountType, String password) {
+        this.mobileNumber = mobileNumber;
+        this.username = username;
+        this.balance = 0.0;
+        this.createdAt = LocalDateTime.now();
+        this.accountHolderName = accountHolderName;
+        this.accountType = accountType;
+        this.password = password;
+    }
 }

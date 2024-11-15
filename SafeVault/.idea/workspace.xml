@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="431bbe7e-5b55-4c6a-afd8-412714bb5a0e" name="Changes" comment="issue with ModelMapper">
+      <change afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountCreationRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountDeletionRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountDtoMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Accounts/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Accounts/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/controller/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/controller/AccountController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/model/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/model/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java" beforeDir="false" afterPath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Record" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2nv4h340IhravT4R4DMGbMgpdhC" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SafeVault.executor": "Debug",
+    "Maven.Accounts [clean].executor": "Run",
+    "Maven.Accounts [compile].executor": "Run",
+    "Maven.SafeVault [clean].executor": "Run",
+    "Maven.SafeVault [validate].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.Accounts.executor": "Run",
+    "git-widget-placeholder": "main",
+    "jdk.selected.JAVA_MODULE": "21",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/himanshu/Documents/intellij-workspace/banking-app/SafeVault/Accounts",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Accounts" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="Accounts" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.safevault.accounts.AccountsApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="431bbe7e-5b55-4c6a-afd8-412714bb5a0e" name="Changes" comment="" />
+      <created>1729840332242</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1729840332242</updated>
+      <workItem from="1729928275582" duration="792000" />
+      <workItem from="1729929096560" duration="692000" />
+      <workItem from="1729994238315" duration="943000" />
+      <workItem from="1730039929503" duration="3384000" />
+      <workItem from="1730044500771" duration="3536000" />
+      <workItem from="1730094678951" duration="932000" />
+      <workItem from="1730099685294" duration="2153000" />
+      <workItem from="1730105521409" duration="6744000" />
+      <workItem from="1730279970257" duration="1022000" />
+      <workItem from="1730281827441" duration="775000" />
+      <workItem from="1730294081660" duration="2866000" />
+      <workItem from="1730311130512" duration="274000" />
+      <workItem from="1730353898421" duration="4038000" />
+      <workItem from="1730361315189" duration="5678000" />
+      <workItem from="1730375209323" duration="2671000" />
+      <workItem from="1730383272563" duration="1618000" />
+      <workItem from="1730434245188" duration="100000" />
+    </task>
+    <task id="LOCAL-00001" summary="issue with ModelMapper">
+      <option name="closed" value="true" />
+      <created>1730311238693</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1730311238694</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="issue with ModelMapper" />
+    <option name="LAST_COMMIT_MESSAGE" value="issue with ModelMapper" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java</url>
+          <line>37</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java</url>
+          <line>38</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java</url>
+          <line>40</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java</url>
+          <line>48</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java</url>
+          <line>49</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

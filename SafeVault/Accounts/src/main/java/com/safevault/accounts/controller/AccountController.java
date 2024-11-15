@@ -1,5 +1,7 @@
 package com.safevault.accounts.controller;
 
+import com.safevault.accounts.dto.AccountCreationRequest;
+import com.safevault.accounts.dto.AccountDeletionRequest;
 import com.safevault.accounts.dto.AccountDto;
 import com.safevault.accounts.service.AccountServiceImp;
 import org.springframework.http.HttpStatus;
@@ -16,18 +18,24 @@ public class AccountController {
         this.service = service;
     }
 
-    @PostMapping("create")
-    public ResponseEntity<?> createAccount(@RequestBody AccountDto accountDto) {
+    @PostMapping()
+    public ResponseEntity<?> createAccount(@RequestBody AccountCreationRequest accountCreationRequest) {
+        return service.addAccount(accountCreationRequest);
+    }
 
-        if(service.userExists(accountDto)) {
-            return new ResponseEntity<>("User already exist", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @DeleteMapping()
+    public ResponseEntity<?> deleteAccount(@RequestBody AccountDeletionRequest accountDeletionRequest) {
+        return service.removeAccount(accountDeletionRequest);
     }
 
     @GetMapping("test")
     public ResponseEntity<?> test() {
         return new ResponseEntity<>("test passed", HttpStatus.OK);
+    }
+
+    @PostMapping("credit")
+    public ResponseEntity<?> creditAccount(@RequestParam Long id, @RequestParam Double amount) {
+        return service.creditAccount(id, amount);
     }
 
 
