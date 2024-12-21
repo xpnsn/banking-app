@@ -3,6 +3,7 @@ package com.safevault.accounts.service;
 import com.safevault.accounts.dto.AccountCreationRequest;
 import com.safevault.accounts.dto.AccountDeletionRequest;
 import com.safevault.accounts.dto.AccountDto;
+import com.safevault.accounts.dto.TransferRequest;
 import com.safevault.accounts.exception.InsufficientBalanceException;
 import com.safevault.accounts.exception.UserAccountNotFoundException;
 import com.safevault.accounts.model.Account;
@@ -10,6 +11,8 @@ import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import javax.security.auth.login.AccountNotFoundException;
 
 @Service
 
@@ -28,6 +31,12 @@ public class AccountServiceImp implements AccountService {
         return repository.findByUsername(username) != null;
     }
 
+    @Override
+    public AccountDto getAccountById(Long id) {
+        Account account = repository.findById(id).orElse(null);
+        if(account == null) {return null;}
+        return mapper.apply(account);
+    }
     @Override
     public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest) {
         if(userExists(accountCreationRequest.username())) {
@@ -88,5 +97,12 @@ public class AccountServiceImp implements AccountService {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public ResponseEntity<?> transfer(TransferRequest request) {
+        creditAccount(request.accountTo(), request.amount());
+        return debitAccount(request.accountFrom(), request.amount());
+    }
+
 
 }

@@ -3,6 +3,7 @@ package com.safevault.accounts.controller;
 import com.safevault.accounts.dto.AccountCreationRequest;
 import com.safevault.accounts.dto.AccountDeletionRequest;
 import com.safevault.accounts.dto.AccountDto;
+import com.safevault.accounts.dto.TransferRequest;
 import com.safevault.accounts.service.AccountServiceImp;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,11 @@ public class AccountController {
         return service.addAccount(accountCreationRequest);
     }
 
+    @GetMapping("{id}")
+    public AccountDto getAccountById(@PathVariable Long id) {
+        return service.getAccountById(id);
+    }
+
     @DeleteMapping()
     public ResponseEntity<?> deleteAccount(@RequestBody AccountDeletionRequest accountDeletionRequest) {
         return service.removeAccount(accountDeletionRequest);
@@ -38,5 +44,13 @@ public class AccountController {
         return service.creditAccount(id, amount);
     }
 
+    @PostMapping("debit")
+    public ResponseEntity<?> debitAccount(@RequestParam Long id, @RequestParam Double amount) {
+        return service.debitAccount(id, amount);
+    }
 
+    @PostMapping("transfer")
+    public ResponseEntity<?> transfer(@RequestBody TransferRequest request) {
+        return service.transfer(request);
+    }
 }
