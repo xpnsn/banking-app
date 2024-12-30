@@ -1,7 +1,9 @@
 package com.safevault.transactions.feignclient;
 
-import com.safevault.transactions.dto.AccountDto;
-import com.safevault.transactions.dto.TransferRequest;
+import com.safevault.transactions.dto.accounts.AccountDto;
+import com.safevault.transactions.dto.TransactionRequest;
+import com.safevault.transactions.dto.accounts.CreditDebitRequest;
+import com.safevault.transactions.dto.accounts.TransferRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +14,12 @@ public interface AccountsFeignClient {
     @PostMapping("api/v1/accounts/transfer")
     public ResponseEntity<?> transfer(@RequestBody TransferRequest request);
 
-    @GetMapping("api/v1/accounts/{id}")
-    public AccountDto getAccountById(@PathVariable Long id);
+    @GetMapping("api/v1/accounts/id/{id}")
+    public ResponseEntity<?> getAccountById(@PathVariable Long id);
 
+    @PostMapping("api/v1/accounts/credit")
+    public ResponseEntity<?> creditAccount(@RequestBody CreditDebitRequest request);
+
+    @PostMapping("api/v1/accounts/debit")
+    public ResponseEntity<?> debitAccount(@RequestBody CreditDebitRequest request);
 }

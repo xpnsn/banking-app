@@ -1,10 +1,9 @@
 package com.safevault.transactions.service;
 
-import com.safevault.transactions.dto.AccountDto;
-import com.safevault.transactions.dto.TransferRequest;
+import com.safevault.transactions.dto.TransactionRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface TransactionService {
-    public ResponseEntity<?> initiateTransaction(TransferRequest request) throws Exception;
+    public ResponseEntity<?> initiateTransaction(TransactionRequest request) throws Exception;
     public ResponseEntity<?> getAccount(Long id);
 }

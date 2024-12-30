@@ -1,8 +1,9 @@
 package com.safevault.transactions.service;
 
-import com.safevault.transactions.dto.AccountDto;
 import com.safevault.transactions.dto.TransactionDto;
-import com.safevault.transactions.dto.TransferRequest;
+import com.safevault.transactions.dto.TransactionRequest;
+import com.safevault.transactions.dto.accounts.CreditDebitRequest;
+import com.safevault.transactions.dto.accounts.TransferRequest;
 import com.safevault.transactions.feignclient.AccountsFeignClient;
 import com.safevault.transactions.model.Transaction;
 import com.safevault.transactions.model.TransactionStatus;
@@ -22,17 +23,41 @@ public class TransactionServiceImp implements TransactionService {
     TransactionDtoMapper dtoMapper;
 
     @Override
-    public ResponseEntity<?> initiateTransaction(TransferRequest request) {
+    public ResponseEntity<?> initiateTransaction(TransactionRequest request) {
         Transaction transaction = new Transaction(
                 request.accountFrom(),
                 request.accountTo(),
                 request.amount(),
-                TransactionType.TRANSFER,
+                request.transactionType(),
                 TransactionStatus.PENDING
         );
         try {
             TransactionType type = request.transactionType();
-            accountsClient.transfer(request);
+
+            switch (type) {
+                case DEPOSIT:
+                    CreditDebitRequest creditRequest = new CreditDebitRequest(request.accountTo(), request.pin(), request.amount());
+                    accountsClient.creditAccount(creditRequest);
+                    break;
+                case WITHDRAW:
+                    CreditDebitRequest debitRequest = new CreditDebitRequest(request.accountFrom(), request.pin(), request.amount());
+                    accountsClient.creditAccount(debitRequest);
+                    break;
+                case TRANSFER:
+                    TransferRequest transferRequest = new TransferRequest(
+                            request.accountFrom(),
+                            request.accountTo(),
+                            request.pin(),
+                            request.amount(),
+                            request.transactionType()
+                    );
+                    accountsClient.transfer(transferRequest);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid transaction type: " + type);
+            }
+
+
             transaction.setStatus(TransactionStatus.SUCCEEDED);
             TransactionDto transactionDto = dtoMapper.apply(transaction);
 
@@ -49,8 +74,7 @@ public class TransactionServiceImp implements TransactionService {
 
     @Override
     public ResponseEntity<?> getAccount(Long id) {
-        Object body = accountsClient.getAccountById(id);
-        return new ResponseEntity<>(body, HttpStatus.OK);
+        return accountsClient.getAccountById(id);
     }
 
 }

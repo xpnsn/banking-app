@@ -1,9 +1,7 @@
 package com.safevault.accounts.service;
 
-import com.safevault.accounts.dto.AccountCreationRequest;
-import com.safevault.accounts.dto.AccountDeletionRequest;
-import com.safevault.accounts.dto.AccountDto;
-import com.safevault.accounts.dto.TransferRequest;
+import com.safevault.accounts.dto.*;
+import com.safevault.accounts.exception.IncorrectPinException;
 import com.safevault.accounts.exception.InsufficientBalanceException;
 import com.safevault.accounts.exception.UserAccountNotFoundException;
 import com.safevault.accounts.model.Account;
@@ -32,10 +30,14 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
-    public AccountDto getAccountById(Long id) {
-        Account account = repository.findById(id).orElse(null);
-        if(account == null) {return null;}
-        return mapper.apply(account);
+    public ResponseEntity<?> getAccountById(Long id) {
+        try {
+            Account account = repository.findById(id).orElseThrow(UserAccountNotFoundException::new);
+            AccountDto accountDto = mapper.apply(account);
+            return new ResponseEntity<>(accountDto, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
     @Override
     public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest) {
@@ -45,9 +47,11 @@ public class AccountServiceImp implements AccountService {
         Account account = new Account(
                 accountCreationRequest.mobileNumber(),
                 accountCreationRequest.username(),
+                accountCreationRequest.email(),
                 accountCreationRequest.accountHolderName(),
                 accountCreationRequest.accountType(),
-                accountCreationRequest.password()
+                accountCreationRequest.password(),
+                accountCreationRequest.pin()
         );
         repository.save(account);
         AccountDto accountDto = mapper.apply(account);
@@ -55,7 +59,7 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
-    public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) throws UserAccountNotFoundException {
+    public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) {
         try {
             if(!userExists(accountDeletionRequest.username())) {
                 throw new UserAccountNotFoundException();
@@ -70,29 +74,39 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
-    public ResponseEntity<?> creditAccount(Long accountId, Double amount) {
+    public ResponseEntity<?> creditAccount(CreditDebitRequest request) {
         try {
-            Account account = repository.findById(accountId).orElseThrow(UserAccountNotFoundException::new);
-            account.setBalance(account.getBalance() + amount);
+            Account account = repository.findById(request.accountId()).orElseThrow(UserAccountNotFoundException::new);
+            if(!account.getPin().equals(request.pin())) {
+                throw new IncorrectPinException();
+            }
+            account.setBalance(account.getBalance() + request.amount());
             repository.save(account);
             AccountDto accountDto = mapper.apply(account);
             return new ResponseEntity<>(accountDto, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity<?> debitAccount(Long accountId, Double amount){
+    public ResponseEntity<?> debitAccount(CreditDebitRequest request){
         try {
-            Account account = repository.findById(accountId).orElseThrow(UserAccountNotFoundException::new);
-            if(account.getBalance() < amount) {
+            Account account = repository.findById(request.accountId()).orElseThrow(UserAccountNotFoundException::new);
+            if(!account.getPin().equals(request.pin())) {
+                throw new IncorrectPinException();
+            }
+            if(account.getBalance() < request.amount()) {
                 throw new InsufficientBalanceException();
             }
-            account.setBalance(account.getBalance() - amount);
+            account.setBalance(account.getBalance() - request.amount());
             repository.save(account);
             AccountDto accountDto = mapper.apply(account);
             return new ResponseEntity<>(accountDto, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -100,8 +114,10 @@ public class AccountServiceImp implements AccountService {
 
     @Override
     public ResponseEntity<?> transfer(TransferRequest request) {
-        creditAccount(request.accountTo(), request.amount());
-        return debitAccount(request.accountFrom(), request.amount());
+        CreditDebitRequest creditRequest = new CreditDebitRequest(request.accountTo(), request.pin(), request.amount());
+        CreditDebitRequest debitRequest = new CreditDebitRequest(request.accountFrom(), request.pin(), request.amount());
+        creditAccount(creditRequest);
+        return debitAccount(debitRequest);
     }
 
 

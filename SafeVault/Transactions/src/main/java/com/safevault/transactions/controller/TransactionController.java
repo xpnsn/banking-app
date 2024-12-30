@@ -1,7 +1,6 @@
 package com.safevault.transactions.controller;
 
-import com.safevault.transactions.dto.AccountDto;
-import com.safevault.transactions.dto.TransferRequest;
+import com.safevault.transactions.dto.TransactionRequest;
 import com.safevault.transactions.service.TransactionServiceImp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ public class TransactionController {
     }
 
     @PostMapping("initiate")
-    public ResponseEntity<?> initiateTransaction(@RequestBody TransferRequest request) {
+    public ResponseEntity<?> initiateTransaction(@RequestBody TransactionRequest request) {
         return serviceImp.initiateTransaction(request);
     }
 

@@ -1,4 +1,4 @@
-package com.safevault.transactions.dto;
+package com.safevault.transactions.dto.accounts;
 
 import com.safevault.transactions.model.AccountType;
 
