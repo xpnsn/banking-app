@@ -1,5 +1,6 @@
 package com.safevault.security.service;
 
+import com.safevault.security.dto.LoginRequest;
 import com.safevault.security.entity.UserEntity;
 import com.safevault.security.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -9,15 +10,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AuthService {
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -55,12 +58,14 @@ public class AuthService {
 
     }
 
-    public ResponseEntity<?> generateToken(UserEntity user) {
+    public ResponseEntity<?> generateToken(LoginRequest user) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-//            UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
-            String jwtToken = jwtService.generateToken(user.getUsername());
+                    new UsernamePasswordAuthenticationToken(user.username(), user.password()));
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.username());
+            Map<String, Object> additionalClaims = new HashMap<>();
+            additionalClaims.put("roles", userDetails.getAuthorities());
+            String jwtToken = jwtService.generateToken(userDetails.getUsername(), additionalClaims);
             return new ResponseEntity<>(jwtToken, HttpStatus.OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);

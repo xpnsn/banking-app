@@ -1,7 +1,7 @@
 package com.safevault.accounts.exception;
 
-public class UserAccountNotFoundException extends RuntimeException {
-    public UserAccountNotFoundException() {
+public class AccountNotFoundException extends RuntimeException {
+    public AccountNotFoundException() {
         super("User does not exist with username or mobile number");
     }
 }

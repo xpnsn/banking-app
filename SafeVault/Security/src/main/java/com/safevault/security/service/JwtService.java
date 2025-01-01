@@ -16,8 +16,8 @@ public class JwtService {
 
     public static final String JWT_SECRET = "1B4BAF6A13B5301A3411C93C33630E8F7F219C5F8F3344E7CF";
 
-    public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
+    public String generateToken(String username, Map<String, Object> additionalClaims) {
+        Map<String, Object> claims = new HashMap<>(additionalClaims);
         return createToken(claims, username);
     }
 
@@ -52,7 +52,7 @@ public class JwtService {
                 .subject(username)
                 .header().empty().add("typ", "JWT").and()
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000*10))
+                .expiration(new Date(System.currentTimeMillis() + 1000*60*5))
                 .signWith(getSignKey())
                 .compact();
     }

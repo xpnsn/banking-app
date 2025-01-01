@@ -16,17 +16,8 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
-    @Column(unique = true, nullable = false)
-    String email;
-
     @Column(nullable = false)
     private String pin;
-
-    @Column(nullable = false, unique = true)
-    private Long mobileNumber;
-
-    @Column(nullable = false, unique = true)
-    private String username;
 
     @Column(nullable = false)
     private String accountHolderName;
@@ -42,17 +33,14 @@ public class Account {
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private String password;
+    private Long userId;
 
-    public Account(Long mobileNumber, String username, String emailqw, String accountHolderName, AccountType accountType, String password, String pin) {
-        this.mobileNumber = mobileNumber;
-        this.username = username;
-        this.email = email;
-        this.balance = 0.0;
-        this.createdAt = LocalDateTime.now();
+    public Account(String accountHolderName, AccountType accountType, String pin, Long userId) {
         this.accountHolderName = accountHolderName;
         this.accountType = accountType;
-        this.password = password;
         this.pin = pin;
+        this.userId = userId;
+        this.balance = 0.0;
+        this.createdAt = LocalDateTime.now();
     }
 }

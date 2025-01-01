@@ -16,15 +16,16 @@ public class AccountController {
         this.service = service;
     }
 
+    @GetMapping("id/{id}")
+    public ResponseEntity<?> getAccountById(@PathVariable Long id) {
+        return service.getAccountById(id);
+    }
+
     @PostMapping()
     public ResponseEntity<?> createAccount(@RequestBody AccountCreationRequest accountCreationRequest) {
         return service.addAccount(accountCreationRequest);
     }
 
-    @GetMapping("id/{id}")
-    public ResponseEntity<?> getAccountById(@PathVariable Long id) {
-        return service.getAccountById(id);
-    }
 
     @DeleteMapping()
     public ResponseEntity<?> deleteAccount(@RequestBody AccountDeletionRequest accountDeletionRequest) {

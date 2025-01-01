@@ -30,31 +30,27 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
-        try {
 
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                jwtToken = authorizationHeader.substring(7);
-                username = jwtService.extractUsername(jwtToken);
-            }
-            if(username != null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if(jwtService.validateToken(jwtToken)) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-                filterChain.doFilter(request, response);
-            }
-        } catch (RuntimeException e) {
-            handleException(response, e.getMessage());
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwtToken = authorizationHeader.substring(7);
+            username = jwtService.extractUsername(jwtToken);
         }
+        if(username != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if(jwtService.validateToken(jwtToken)) {
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        }
+        filterChain.doFilter(request, response);
     }
 
-    private void handleException(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set HTTP 401 Unauthorized
-        response.setContentType("application/json");
-        response.getWriter().write("{\"status\": \"INVALID\", \"message\": \"" + message + "\"}");
-        response.getWriter().flush();
-    }
+//    private void handleException(HttpServletResponse response, String message) throws IOException {
+//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set HTTP 401 Unauthorized
+//        response.setContentType("application/json");
+//        response.getWriter().write("{\"status\": \"INVALID\", \"message\": \"" + message + "\"}");
+//        response.getWriter().flush();
+//    }
 }

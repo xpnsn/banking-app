@@ -1,6 +1,7 @@
 package com.safevault.accounts.service;
 
 import com.safevault.accounts.dto.*;
+import com.safevault.accounts.exception.AccountNotFoundException;
 import com.safevault.accounts.exception.IncorrectPinException;
 import com.safevault.accounts.exception.InsufficientBalanceException;
 import com.safevault.accounts.exception.UserAccountNotFoundException;
@@ -9,8 +10,6 @@ import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.security.auth.login.AccountNotFoundException;
 
 @Service
 
@@ -25,14 +24,14 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
-    public boolean userExists(String username) {
-        return repository.findByUsername(username) != null;
+    public boolean accountExist(Long accountId) {
+        return repository.findById(accountId).orElse(null) != null;
     }
 
     @Override
     public ResponseEntity<?> getAccountById(Long id) {
         try {
-            Account account = repository.findById(id).orElseThrow(UserAccountNotFoundException::new);
+            Account account = repository.findById(id).orElseThrow(AccountNotFoundException::new);
             AccountDto accountDto = mapper.apply(account);
             return new ResponseEntity<>(accountDto, HttpStatus.OK);
         } catch (RuntimeException e) {
@@ -41,17 +40,11 @@ public class AccountServiceImp implements AccountService {
     }
     @Override
     public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest) {
-        if(userExists(accountCreationRequest.username())) {
-            return new ResponseEntity<>("User already exist with username or mobile number", HttpStatus.BAD_REQUEST);
-        }
         Account account = new Account(
-                accountCreationRequest.mobileNumber(),
-                accountCreationRequest.username(),
-                accountCreationRequest.email(),
                 accountCreationRequest.accountHolderName(),
                 accountCreationRequest.accountType(),
-                accountCreationRequest.password(),
-                accountCreationRequest.pin()
+                accountCreationRequest.pin(),
+                accountCreationRequest.userId()
         );
         repository.save(account);
         AccountDto accountDto = mapper.apply(account);
@@ -61,7 +54,7 @@ public class AccountServiceImp implements AccountService {
     @Override
     public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) {
         try {
-            if(!userExists(accountDeletionRequest.username())) {
+            if(!accountExist(accountDeletionRequest.username())) {
                 throw new UserAccountNotFoundException();
             }
             repository.deleteById(repository.findByUsername(accountDeletionRequest.username()).getAccountId());

@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 
 public record AccountDto (
         Long accountId,
-        String username,
-        Long mobileNumber,
         AccountType accountType,
         Double balance,
         String accountHolderName

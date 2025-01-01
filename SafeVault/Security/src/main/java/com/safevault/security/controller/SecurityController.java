@@ -1,5 +1,6 @@
 package com.safevault.security.controller;
 
+import com.safevault.security.dto.LoginRequest;
 import com.safevault.security.entity.UserEntity;
 import com.safevault.security.service.AuthService;
 import com.safevault.security.service.CustomUserDetailsService;
@@ -21,7 +22,7 @@ public class SecurityController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserEntity user) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest user) {
         return authService.generateToken(user);
     }
 

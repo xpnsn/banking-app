@@ -7,7 +7,7 @@ import javax.security.auth.login.AccountNotFoundException;
 
 public interface AccountService {
 
-    public boolean userExists(String username);
+    public boolean accountExist(Long accountId);
     public ResponseEntity<?> getAccountById(Long id);
     public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest);
     public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) throws AccountNotFoundException;

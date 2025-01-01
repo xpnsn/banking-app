@@ -12,8 +12,6 @@ public class AccountDtoMapper implements Function<Account, AccountDto> {
     public AccountDto apply(Account account) {
         return new AccountDto(
                 account.getAccountId(),
-                account.getUsername(),
-                account.getMobileNumber(),
                 account.getAccountType(),
                 account.getBalance(),
                 account.getAccountHolderName()
