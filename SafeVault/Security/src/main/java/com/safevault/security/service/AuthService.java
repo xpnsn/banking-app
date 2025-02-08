@@ -1,20 +1,24 @@
 package com.safevault.security.service;
 
 import com.safevault.security.dto.LoginRequest;
+import com.safevault.security.dto.UserDto;
 import com.safevault.security.entity.UserEntity;
+import com.safevault.security.mapper.DtoMapper;
 import com.safevault.security.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AuthService {
@@ -33,6 +37,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private DtoMapper mapper;
 
     public ResponseEntity<?> saveUser(UserEntity user) {
         try {
@@ -63,12 +70,15 @@ public class AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.username(), user.password()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.username());
-            Map<String, Object> additionalClaims = new HashMap<>();
-            additionalClaims.put("roles", userDetails.getAuthorities());
-            String jwtToken = jwtService.generateToken(userDetails.getUsername(), additionalClaims);
+            String jwtToken = jwtService.generateToken(userDetails);
             return new ResponseEntity<>(jwtToken, HttpStatus.OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public UserDto getUser(String username) {
+        UserEntity user = userRepository.findByUsername(username);
+        return mapper.apply(user);
     }
 }

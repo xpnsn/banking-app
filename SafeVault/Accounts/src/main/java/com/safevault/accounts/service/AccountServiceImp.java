@@ -4,7 +4,6 @@ import com.safevault.accounts.dto.*;
 import com.safevault.accounts.exception.AccountNotFoundException;
 import com.safevault.accounts.exception.IncorrectPinException;
 import com.safevault.accounts.exception.InsufficientBalanceException;
-import com.safevault.accounts.exception.UserAccountNotFoundException;
 import com.safevault.accounts.model.Account;
 import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
@@ -43,8 +42,8 @@ public class AccountServiceImp implements AccountService {
         Account account = new Account(
                 accountCreationRequest.accountHolderName(),
                 accountCreationRequest.accountType(),
-                accountCreationRequest.pin(),
-                accountCreationRequest.userId()
+                accountCreationRequest.userId(),
+                accountCreationRequest.pin()
         );
         repository.save(account);
         AccountDto accountDto = mapper.apply(account);
@@ -53,23 +52,24 @@ public class AccountServiceImp implements AccountService {
 
     @Override
     public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) {
-        try {
-            if(!accountExist(accountDeletionRequest.username())) {
-                throw new UserAccountNotFoundException();
-            }
-            repository.deleteById(repository.findByUsername(accountDeletionRequest.username()).getAccountId());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+//        try {
+//            if(!accountExist(accountDeletionRequest.userId())) {
+//                throw new AccountNotFoundException();
+//            }
+//            repository.deleteById(accountDeletionRequest.userId());
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        } catch (RuntimeException e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+        return new ResponseEntity<>("Account Removed!", HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<?> creditAccount(CreditDebitRequest request) {
         try {
-            Account account = repository.findById(request.accountId()).orElseThrow(UserAccountNotFoundException::new);
+            Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
             if(!account.getPin().equals(request.pin())) {
                 throw new IncorrectPinException();
             }
@@ -87,7 +87,7 @@ public class AccountServiceImp implements AccountService {
     @Override
     public ResponseEntity<?> debitAccount(CreditDebitRequest request){
         try {
-            Account account = repository.findById(request.accountId()).orElseThrow(UserAccountNotFoundException::new);
+            Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
             if(!account.getPin().equals(request.pin())) {
                 throw new IncorrectPinException();
             }

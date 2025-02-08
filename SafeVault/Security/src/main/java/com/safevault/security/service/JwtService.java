@@ -1,9 +1,11 @@
 package com.safevault.security.service;
 
+import com.safevault.security.dto.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -16,9 +18,13 @@ public class JwtService {
 
     public static final String JWT_SECRET = "1B4BAF6A13B5301A3411C93C33630E8F7F219C5F8F3344E7CF";
 
-    public String generateToken(String username, Map<String, Object> additionalClaims) {
-        Map<String, Object> claims = new HashMap<>(additionalClaims);
-        return createToken(claims, username);
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        CustomUserDetails user = (CustomUserDetails) userDetails;
+        claims.put("id", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("name", user.getName());
+        return createToken(claims, userDetails.getUsername());
     }
 
     private boolean isTokenExpired(String token) {

@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@Entity
+@Entity(name = "accounts")
 @NoArgsConstructor
-@Table(name = "accounts")
 public class Account {
 
     @Id
@@ -35,7 +34,7 @@ public class Account {
     @Column(nullable = false)
     private Long userId;
 
-    public Account(String accountHolderName, AccountType accountType, String pin, Long userId) {
+    public Account(String accountHolderName, AccountType accountType, Long userId, String pin) {
         this.accountHolderName = accountHolderName;
         this.accountType = accountType;
         this.pin = pin;
