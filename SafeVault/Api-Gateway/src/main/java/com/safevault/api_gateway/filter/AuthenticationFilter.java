@@ -12,8 +12,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.nio.charset.StandardCharsets;
-
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
@@ -33,14 +31,19 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 return chain.filter(exchange.mutate().request(request).build());
             }
             String token = getToken(exchange);
+            String userId;
 
             try {
                 Jws<Claims> claimsJws = Jwts.parser()
                         .setSigningKey(JWT_SECRET)
                         .build().parseClaimsJws(token);
-                Claims claims = claimsJws.getBody();
+                Claims claims = claimsJws.getPayload();
+                userId = String.valueOf(claims.get("id", Object.class));
 
-                request = exchange.getRequest().mutate().header("X-Secret-Key", "SECRET").build();
+                request = exchange.getRequest().mutate()
+                        .header("X-Secret-Key", "SECRET")
+//                        .header("X-User-Id", )
+                        .build();
             } catch (Exception e) {
                 throw new RuntimeException("Invalid token", e);
             }

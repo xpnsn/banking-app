@@ -5,21 +5,25 @@ spring:
     gateway:
       routes:
         - id: security-service
-#          uri: lb://SECURITY
-          uri: http://localhost:8092
+          uri: lb://SECURITY
+#          uri: http://localhost:8092
           predicates:
             - Path=/api/v1/security/**
           filters:
             - AuthenticationFilter
 
-        - id: transaction-service
+        - id: account-service
           uri: lb://ACCOUNTS
           predicates:
             - Path=/api/v1/accounts/**
+          filters:
+            - AuthenticationFilter
 
-        - id: account-service
+        - id: transaction-service
           uri: lb://TRANSACTIONS
           predicates:
             - Path=/api/v1/transactions/**
+          filters:
+            - AuthenticationFilter
 server:
   port: 8765

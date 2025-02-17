@@ -31,8 +31,10 @@ public class Account {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(unique = true)
     private Long userId;
+
+    private boolean isVerified;
 
     public Account(String accountHolderName, AccountType accountType, Long userId, String pin) {
         this.accountHolderName = accountHolderName;
@@ -41,5 +43,6 @@ public class Account {
         this.userId = userId;
         this.balance = 0.0;
         this.createdAt = LocalDateTime.now();
+        this.isVerified = false;
     }
 }

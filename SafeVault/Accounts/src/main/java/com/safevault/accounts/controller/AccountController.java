@@ -32,9 +32,9 @@ public class AccountController {
         return service.removeAccount(accountDeletionRequest);
     }
 
-    @GetMapping("test")
-    public ResponseEntity<?> test() {
-        return new ResponseEntity<>("test passed", HttpStatus.OK);
+    @PostMapping("test")
+    public ResponseEntity<?> test(@RequestHeader("X-User-Id") String userId) {
+        return new ResponseEntity<>("User : "+userId, HttpStatus.OK);
     }
 
     @PostMapping("credit")
