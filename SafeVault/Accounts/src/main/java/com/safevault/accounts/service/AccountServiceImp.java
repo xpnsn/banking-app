@@ -1,14 +1,20 @@
 package com.safevault.accounts.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safevault.accounts.dto.*;
 import com.safevault.accounts.exception.AccountNotFoundException;
 import com.safevault.accounts.exception.IncorrectPinException;
 import com.safevault.accounts.exception.InsufficientBalanceException;
+import com.safevault.accounts.feignClient.SecurityFeignClient;
 import com.safevault.accounts.model.Account;
 import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 
@@ -16,10 +22,14 @@ public class AccountServiceImp implements AccountService {
 
     private final AccountRepository repository;
     private final AccountDtoMapper mapper;
+    private final SecurityFeignClient securityClient;
+    private final ObjectMapper objectMapper;
 
-    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper) {
+    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper) {
         this.repository = repository;
         this.mapper = mapper;
+        this.securityClient = securityClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -38,11 +48,12 @@ public class AccountServiceImp implements AccountService {
         }
     }
     @Override
-    public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest) {
+    public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest, String userId) {
+        UserDto user = objectMapper.convertValue(securityClient.validate(userId).getBody(), UserDto.class);
         Account account = new Account(
-                accountCreationRequest.accountHolderName(),
+                user.name(),
                 accountCreationRequest.accountType(),
-                accountCreationRequest.userId(),
+                Long.valueOf(userId),
                 accountCreationRequest.pin()
         );
         repository.save(account);
@@ -113,5 +124,25 @@ public class AccountServiceImp implements AccountService {
         return debitAccount(debitRequest);
     }
 
+    @Override
+    public ResponseEntity<?> test(String userId) {
 
+        return new ResponseEntity<>(securityClient.validate(userId).getBody(), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> getUnverifiedAccounts() {
+        List<Account> unverifiedAccounts = repository.findAll().stream().filter(account -> !account.isVerified()).toList();
+        return new ResponseEntity<>(unverifiedAccounts, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> verifyAccount(Long accountId) {
+        Account account = repository.findById(accountId).orElse(null);
+        if(account == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        account.setVerified(true);
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
 }

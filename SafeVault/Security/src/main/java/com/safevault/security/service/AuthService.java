@@ -1,6 +1,7 @@
 package com.safevault.security.service;
 
 import com.safevault.security.dto.LoginRequest;
+import com.safevault.security.dto.RegistrationRequest;
 import com.safevault.security.dto.UserDto;
 import com.safevault.security.entity.UserEntity;
 import com.safevault.security.mapper.DtoMapper;
@@ -11,14 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class AuthService {
@@ -41,11 +39,18 @@ public class AuthService {
     @Autowired
     private DtoMapper mapper;
 
-    public ResponseEntity<?> saveUser(UserEntity user) {
+    public ResponseEntity<?> saveUser(RegistrationRequest user) {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRoles(List.of("USER"));
-            userRepository.save(user);
+            UserEntity userEntity = new UserEntity(
+                    null,
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getName(),
+                    user.getPassword(),
+                    List.of("USER")
+            );
+            userRepository.save(userEntity);
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -80,5 +85,13 @@ public class AuthService {
     public UserDto getUser(String username) {
         UserEntity user = userRepository.findByUsername(username);
         return mapper.apply(user);
+    }
+
+    public ResponseEntity<?> getUserById(String userId) {
+        UserEntity user = userRepository.findById(Long.valueOf(userId)).orElse(null);
+
+        if(user == null) {return null;}
+        return new ResponseEntity<>(mapper.apply(user), HttpStatus.OK);
+
     }
 }

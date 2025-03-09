@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Service
 public class TransactionServiceImp implements TransactionService {
@@ -23,9 +24,9 @@ public class TransactionServiceImp implements TransactionService {
     TransactionDtoMapper dtoMapper;
 
     @Override
-    public ResponseEntity<?> initiateTransaction(TransactionRequest request) {
+    public ResponseEntity<?> initiateTransaction(TransactionRequest request, String userId) {
         Transaction transaction = new Transaction(
-                request.accountFrom(),
+                Long.valueOf(userId),
                 request.accountTo(),
                 request.amount(),
                 request.transactionType(),
@@ -36,16 +37,24 @@ public class TransactionServiceImp implements TransactionService {
 
             switch (type) {
                 case DEPOSIT:
-                    CreditDebitRequest creditRequest = new CreditDebitRequest(request.accountTo(), request.pin(), request.amount());
+                    CreditDebitRequest creditRequest = new CreditDebitRequest(
+                            Long.valueOf(userId),
+                            request.pin(),
+                            request.amount()
+                    );
                     accountsClient.creditAccount(creditRequest);
                     break;
                 case WITHDRAW:
-                    CreditDebitRequest debitRequest = new CreditDebitRequest(request.accountFrom(), request.pin(), request.amount());
-                    accountsClient.creditAccount(debitRequest);
+                    CreditDebitRequest debitRequest = new CreditDebitRequest(
+                            Long.valueOf(userId),
+                            request.pin(),
+                            request.amount()
+                    );
+                    accountsClient.debitAccount(debitRequest);
                     break;
                 case TRANSFER:
                     TransferRequest transferRequest = new TransferRequest(
-                            request.accountFrom(),
+                            Long.valueOf(userId),
                             request.accountTo(),
                             request.pin(),
                             request.amount(),

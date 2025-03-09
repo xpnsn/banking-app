@@ -17,8 +17,8 @@ public class TransactionDtoMapper implements Function<Transaction, TransactionDt
     @Override
     public TransactionDto apply(Transaction transaction) {
         return new TransactionDto(
-                transaction.getFromAccountId().toString(),
-                transaction.getToAccountId().toString(),
+                transaction.getFromAccountId() != null ? transaction.getFromAccountId().toString() : null,
+                transaction.getToAccountId() != null ? transaction.getToAccountId().toString() : null,
                 transaction.getAmount(),
                 transaction.getTimeStamp(),
                 transaction.getTransactionType(),

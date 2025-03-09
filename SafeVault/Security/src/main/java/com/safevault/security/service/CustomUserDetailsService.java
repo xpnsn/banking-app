@@ -27,14 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
             UserEntity user = userRepository.findByUsername(username);
-            UserDto userDto = dtoMapper.apply(user);
             return new CustomUserDetails(
-                    userDto.getId(),
-                    userDto.getUsername(),
-                    userDto.getPassword(),
-                    userDto.getEmail(),
-                    userDto.getName(),
-                    userDto.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+                    user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getEmail(),
+                    user.getName(),
+                    user.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
             );
         } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException(username);

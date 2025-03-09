@@ -1,7 +1,7 @@
 package com.safevault.security.controller;
 
 import com.safevault.security.dto.LoginRequest;
-import com.safevault.security.entity.UserEntity;
+import com.safevault.security.dto.RegistrationRequest;
 import com.safevault.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ public class SecurityController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserEntity user) {
+    public ResponseEntity<?> register(@RequestBody RegistrationRequest user) {
         return authService.saveUser(user);
     }
 
     @PostMapping("/validate")
-    public String validate() {
-        return "VALID";
+    public ResponseEntity<?> validate(@RequestHeader("X-User-Id") String userId) {
+        return authService.getUserById(userId);
     }
 }

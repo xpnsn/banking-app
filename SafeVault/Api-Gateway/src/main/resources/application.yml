@@ -6,7 +6,6 @@ spring:
       routes:
         - id: security-service
           uri: lb://SECURITY
-#          uri: http://localhost:8092
           predicates:
             - Path=/api/v1/security/**
           filters:

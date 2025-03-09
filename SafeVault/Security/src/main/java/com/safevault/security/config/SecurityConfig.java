@@ -22,7 +22,7 @@ public class SecurityConfig{
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/security/admin").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/security/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(
                             req -> "SECRET".equals(req.getHeader("X-Secret-Key"))
                         ).permitAll()

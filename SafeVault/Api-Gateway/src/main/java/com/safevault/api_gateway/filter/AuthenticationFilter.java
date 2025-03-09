@@ -42,7 +42,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 request = exchange.getRequest().mutate()
                         .header("X-Secret-Key", "SECRET")
-//                        .header("X-User-Id", )
+                        .header("X-User-Id", userId)
                         .build();
             } catch (Exception e) {
                 throw new RuntimeException("Invalid token", e);

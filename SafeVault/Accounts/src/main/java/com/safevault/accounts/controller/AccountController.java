@@ -22,8 +22,11 @@ public class AccountController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createAccount(@RequestBody AccountCreationRequest accountCreationRequest) {
-        return service.addAccount(accountCreationRequest);
+    public ResponseEntity<?> createAccount(
+            @RequestBody AccountCreationRequest accountCreationRequest,
+            @RequestHeader("X-User-Id") String userId
+    ) {
+        return service.addAccount(accountCreationRequest, userId);
     }
 
 
@@ -34,7 +37,7 @@ public class AccountController {
 
     @PostMapping("test")
     public ResponseEntity<?> test(@RequestHeader("X-User-Id") String userId) {
-        return new ResponseEntity<>("User : "+userId, HttpStatus.OK);
+        return service.test(userId);
     }
 
     @PostMapping("credit")

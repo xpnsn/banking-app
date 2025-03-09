@@ -31,8 +31,12 @@ public class Account {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(unique = true)
+    @Column(nullable = false)
     private Long userId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountStatus status;
 
     private boolean isVerified;
 
@@ -44,5 +48,7 @@ public class Account {
         this.balance = 0.0;
         this.createdAt = LocalDateTime.now();
         this.isVerified = false;
+        this.status = AccountStatus.INACTIVE;
+        this.userId = userId;
     }
 }
