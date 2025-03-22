@@ -36,18 +36,23 @@ public class AccountController {
     }
 
     @PostMapping("test")
-    public ResponseEntity<?> test(@RequestHeader("X-User-Id") String userId) {
-        return service.test(userId);
+    public ResponseEntity<?> test() {
+        return service.test();
     }
 
     @PostMapping("credit")
     public ResponseEntity<?> creditAccount(@RequestBody CreditDebitRequest request) {
-        return service.creditAccount(request);
+        return service.creditAccount(request, false);
     }
 
     @PostMapping("debit")
     public ResponseEntity<?> debitAccount(@RequestBody CreditDebitRequest request) {
         return service.debitAccount(request);
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllAccounts(@RequestHeader("X-User-Id") String userId) {
+        return service.getAccountsByUserId(userId);
     }
 
     @PostMapping("transfer")

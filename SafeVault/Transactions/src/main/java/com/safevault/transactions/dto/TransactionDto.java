@@ -6,8 +6,8 @@ import com.safevault.transactions.model.TransactionType;
 import java.time.LocalDateTime;
 
 public record TransactionDto(
-        String usernameTo,
-        String usernameFrom,
+        String accountTo,
+        String accountFrom,
         Double amount,
         LocalDateTime timeStamp,
         TransactionType transactionType,

@@ -5,6 +5,7 @@ import com.safevault.security.dto.RegistrationRequest;
 import com.safevault.security.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,7 +26,12 @@ public class SecurityController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<?> validate(@RequestHeader("X-User-Id") String userId) {
-        return authService.getUserById(userId);
+    public ResponseEntity<?> validate() {
+        return authService.getUser();
+    }
+
+    @PostMapping("/add-account-to-user")
+    public ResponseEntity<String> addAccountToUser(@RequestParam String accountId) {
+        return authService.addAccountToUser(accountId);
     }
 }

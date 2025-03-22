@@ -18,11 +18,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String secretKey;
-
-    public SecurityConfig(@Value("${SECRET_KEY}") String secretKey) {
-        this.secretKey = secretKey;
-    }
+    @Value("${secret.key}")
+    private String secretKey;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,7 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("api/v1/accounts/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(
-                                req -> "SECRET".equals(req.getHeader("X-Secret-Key"))
+                                req -> secretKey.equals(req.getHeader("X-Secret-Key"))
                         ).permitAll()
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -2,14 +2,15 @@ package com.safevault.accounts.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safevault.accounts.dto.*;
-import com.safevault.accounts.exception.AccountNotFoundException;
-import com.safevault.accounts.exception.IncorrectPinException;
-import com.safevault.accounts.exception.InsufficientBalanceException;
+import com.safevault.accounts.exception.*;
 import com.safevault.accounts.feignClient.SecurityFeignClient;
 import com.safevault.accounts.model.Account;
+import com.safevault.accounts.model.AccountStatus;
 import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,16 +50,39 @@ public class AccountServiceImp implements AccountService {
     }
     @Override
     public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest, String userId) {
-        UserDto user = objectMapper.convertValue(securityClient.validate(userId).getBody(), UserDto.class);
-        Account account = new Account(
-                user.name(),
-                accountCreationRequest.accountType(),
-                Long.valueOf(userId),
-                accountCreationRequest.pin()
-        );
-        repository.save(account);
-        AccountDto accountDto = mapper.apply(account);
-        return new ResponseEntity<>(accountDto, HttpStatus.CREATED);
+        Account account = null;
+        try {
+            Account acc = repository.findByUserIdAndAccountType(Long.valueOf(userId), accountCreationRequest.accountType()).orElse(null);
+            if(acc != null) {
+                if(acc.isVerified()) {
+                    throw new DuplicateAccountException("You already have an active account of this type.");
+                } else {
+                    throw new DuplicateAccountException("Your request for this account type is already pending approval.");
+                }
+            }
+            UserDto user = objectMapper.convertValue(securityClient.validate().getBody(), UserDto.class);
+
+            account = new Account(
+                    user.name(),
+                    accountCreationRequest.accountType(),
+                    Long.valueOf(userId),
+                    accountCreationRequest.pin()
+            );
+            repository.save(account);
+            AccountDto accountDto = mapper.apply(account);
+            ResponseEntity<?> responseEntity = securityClient.addAccountToUser(accountDto.accountId().toString());
+            if(responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+                return new ResponseEntity<>(accountDto, HttpStatus.CREATED);
+            } else {
+                repository.delete(account);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        } catch (IllegalArgumentException e) {
+            if(account != null) {
+                repository.delete(account);
+            }
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override
@@ -78,20 +102,19 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
-    public ResponseEntity<?> creditAccount(CreditDebitRequest request) {
+    public ResponseEntity<?> creditAccount(CreditDebitRequest request, boolean isTypeTransfer) {
         try {
             Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
-            if(!account.getPin().equals(request.pin())) {
+            notInactiveAccount(account);
+            if(!account.getPin().equals(request.pin()) && !isTypeTransfer) {
                 throw new IncorrectPinException();
             }
             account.setBalance(account.getBalance() + request.amount());
             repository.save(account);
             AccountDto accountDto = mapper.apply(account);
             return new ResponseEntity<>(accountDto, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -99,6 +122,7 @@ public class AccountServiceImp implements AccountService {
     public ResponseEntity<?> debitAccount(CreditDebitRequest request){
         try {
             Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
+            notInactiveAccount(account);
             if(!account.getPin().equals(request.pin())) {
                 throw new IncorrectPinException();
             }
@@ -118,16 +142,26 @@ public class AccountServiceImp implements AccountService {
 
     @Override
     public ResponseEntity<?> transfer(TransferRequest request) {
-        CreditDebitRequest creditRequest = new CreditDebitRequest(request.accountTo(), request.pin(), request.amount());
-        CreditDebitRequest debitRequest = new CreditDebitRequest(request.accountFrom(), request.pin(), request.amount());
-        creditAccount(creditRequest);
-        return debitAccount(debitRequest);
+        Account accountFrom = repository.findById(request.accountFrom()).orElseThrow(AccountNotFoundException::new);
+        Account accountTo = repository.findById(request.accountTo()).orElseThrow(AccountNotFoundException::new);
+        notInactiveAccount(accountFrom);
+        notInactiveAccount(accountTo);
+        if(!accountFrom.getPin().equals(request.pin())) {
+            throw new IncorrectPinException();
+        }
+        if(accountFrom.getBalance() < request.amount()) {
+            throw new InsufficientBalanceException();
+        }
+        accountFrom.setBalance(accountFrom.getBalance() - request.amount());
+        accountTo.setBalance(accountTo.getBalance() + request.amount());
+        repository.save(accountFrom);
+        repository.save(accountTo);
+        return new ResponseEntity<>(accountFrom, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<?> test(String userId) {
-
-        return new ResponseEntity<>(securityClient.validate(userId).getBody(), HttpStatus.OK);
+    public ResponseEntity<?> test() {
+        return new ResponseEntity<>(securityClient.validate().getBody(), HttpStatus.OK);
     }
 
     @Override
@@ -140,9 +174,22 @@ public class AccountServiceImp implements AccountService {
     public ResponseEntity<?> verifyAccount(Long accountId) {
         Account account = repository.findById(accountId).orElse(null);
         if(account == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new AccountNotFoundException();
         }
         account.setVerified(true);
         return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+
+    @Override
+    public void notInactiveAccount(Account account) {
+        if(account.getStatus().equals(AccountStatus.INACTIVE)) {
+            throw new InactiveAccountException();
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> getAccountsByUserId(String userId) {
+        List<Account> allByUserId = repository.getAllByUserId(Long.valueOf(userId));
+        return new ResponseEntity<>(allByUserId, HttpStatus.OK);
     }
 }

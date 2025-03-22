@@ -25,4 +25,8 @@ spring:
           filters:
             - AuthenticationFilter
 server:
-  port: 8765
+  port: 5000
+jwt:
+  secret:${JWT_SECRET}
+secret:
+  key:${SECRET_KEY}

@@ -26,6 +26,4 @@ public class TransactionController {
     }
     @GetMapping("test")
     public String test() {return "SUCCESS";}
-
-
 }

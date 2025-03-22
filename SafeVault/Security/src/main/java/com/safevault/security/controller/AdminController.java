@@ -29,4 +29,5 @@ public class AdminController {
     public ResponseEntity<?> removeAdmin(@RequestParam String username) {
         return adminService.removeAdmin(username);
     }
+
 }

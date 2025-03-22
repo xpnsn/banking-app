@@ -5,29 +5,42 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
-    public static final String JWT_SECRET = "1B4BAF6A13B5301A3411C93C33630E8F7F219C5F8F3344E7CF";
+    @Value("${jwt.secret}")
+    private String JWT_SECRET;
+    @Value("${secret.key}")
+    private String SECRET_KEY;
 
     public AuthenticationFilter() {
         super(Config.class);
     }
 
     @Override
-    public GatewayFilter apply(AuthenticationFilter.Config config) {
+    public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             String path = exchange.getRequest().getPath().toString();
             ServerHttpRequest request = exchange.getRequest();
             if(path.equals("/api/v1/security/login")||path.equals("/api/v1/security/register")) {
-                request = exchange.getRequest().mutate().header("X-Secret-Key", "SECRET").build();
+                request = exchange.getRequest().mutate().header("X-Secret-Key", SECRET_KEY).build();
                 return chain.filter(exchange.mutate().request(request).build());
             }
             String token = getToken(exchange);
@@ -39,13 +52,24 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         .build().parseClaimsJws(token);
                 Claims claims = claimsJws.getPayload();
                 userId = String.valueOf(claims.get("id", Object.class));
+                List<String> roles = ((List<?>) claims.get("roles", Object.class))
+                        .stream()
+                        .map(role -> (String) ((Map<?, ?>) role).get("authority"))
+                        .collect(Collectors.toList());
+
 
                 request = exchange.getRequest().mutate()
-                        .header("X-Secret-Key", "SECRET")
+                        .header("X-Secret-Key", SECRET_KEY)
                         .header("X-User-Id", userId)
+                        .header("X-Authorities", String.join(",", roles))
+                        .header("X-Username", claims.getSubject())
                         .build();
             } catch (Exception e) {
-                throw new RuntimeException("Invalid token", e);
+                ServerHttpResponse response = exchange.getResponse();
+                response.setStatusCode(HttpStatus.BAD_REQUEST);
+                byte[] bytes = e.getMessage().getBytes(StandardCharsets.UTF_8);
+                DataBuffer buffer = response.bufferFactory().wrap(bytes);
+                return response.writeWith(Mono.just(buffer));
             }
             return chain.filter(exchange.mutate().request(request).build());
         };

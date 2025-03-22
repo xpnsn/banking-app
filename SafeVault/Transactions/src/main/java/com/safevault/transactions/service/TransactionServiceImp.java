@@ -1,10 +1,13 @@
 package com.safevault.transactions.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safevault.transactions.dto.TransactionDto;
 import com.safevault.transactions.dto.TransactionRequest;
+import com.safevault.transactions.dto.UserDto;
 import com.safevault.transactions.dto.accounts.CreditDebitRequest;
 import com.safevault.transactions.dto.accounts.TransferRequest;
 import com.safevault.transactions.feignclient.AccountsFeignClient;
+import com.safevault.transactions.feignclient.AuthenticationFeignClient;
 import com.safevault.transactions.model.Transaction;
 import com.safevault.transactions.model.TransactionStatus;
 import com.safevault.transactions.model.TransactionType;
@@ -17,16 +20,25 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @Service
 public class TransactionServiceImp implements TransactionService {
 
-    @Autowired
-    AccountsFeignClient accountsClient;
+    private final AuthenticationFeignClient authClient;
+    private final AccountsFeignClient accountsClient;
+    private final TransactionDtoMapper dtoMapper;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    TransactionDtoMapper dtoMapper;
+    public TransactionServiceImp(AuthenticationFeignClient authClient, AccountsFeignClient accountsClient, TransactionDtoMapper dtoMapper, ObjectMapper objectMapper) {
+        this.authClient = authClient;
+        this.accountsClient = accountsClient;
+        this.dtoMapper = dtoMapper;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public ResponseEntity<?> initiateTransaction(TransactionRequest request, String userId) {
+
+        UserDto userDto = objectMapper.convertValue(authClient.validate().getBody(), UserDto.class);
+
         Transaction transaction = new Transaction(
-                Long.valueOf(userId),
+                request.accountFrom(),
                 request.accountTo(),
                 request.amount(),
                 request.transactionType(),
@@ -38,7 +50,7 @@ public class TransactionServiceImp implements TransactionService {
             switch (type) {
                 case DEPOSIT:
                     CreditDebitRequest creditRequest = new CreditDebitRequest(
-                            Long.valueOf(userId),
+                            request.accountTo(),
                             request.pin(),
                             request.amount()
                     );
@@ -46,7 +58,7 @@ public class TransactionServiceImp implements TransactionService {
                     break;
                 case WITHDRAW:
                     CreditDebitRequest debitRequest = new CreditDebitRequest(
-                            Long.valueOf(userId),
+                            request.accountFrom(),
                             request.pin(),
                             request.amount()
                     );
@@ -54,7 +66,7 @@ public class TransactionServiceImp implements TransactionService {
                     break;
                 case TRANSFER:
                     TransferRequest transferRequest = new TransferRequest(
-                            Long.valueOf(userId),
+                            request.accountFrom(),
                             request.accountTo(),
                             request.pin(),
                             request.amount(),
@@ -65,7 +77,6 @@ public class TransactionServiceImp implements TransactionService {
                 default:
                     throw new IllegalArgumentException("Invalid transaction type: " + type);
             }
-
 
             transaction.setStatus(TransactionStatus.SUCCEEDED);
             TransactionDto transactionDto = dtoMapper.apply(transaction);

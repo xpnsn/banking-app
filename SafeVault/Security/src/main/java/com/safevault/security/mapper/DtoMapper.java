@@ -17,7 +17,8 @@ public class DtoMapper implements Function<UserEntity, UserDto> {
                 userEntity.getUsername(),
                 userEntity.getName(),
                 userEntity.getEmail(),
-                userEntity.getRoles()
+                userEntity.getRoles(),
+                userEntity.getAccountIds().stream().toList()
         );
     }
 }

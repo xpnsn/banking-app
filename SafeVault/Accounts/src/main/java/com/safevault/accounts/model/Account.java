@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity(name = "accounts")
 @NoArgsConstructor
+@Table(name = "accounts", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "account_type"}))
 public class Account {
 
     @Id
