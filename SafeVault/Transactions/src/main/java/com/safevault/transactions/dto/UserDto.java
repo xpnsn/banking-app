@@ -6,5 +6,6 @@ public record UserDto(
         String username,
         String name,
         String email,
-        List<String> roles
+        List<String> roles,
+        List<Long> accounts
 ){}

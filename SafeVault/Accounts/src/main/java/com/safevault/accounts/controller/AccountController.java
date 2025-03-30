@@ -59,4 +59,9 @@ public class AccountController {
     public ResponseEntity<?> transfer(@RequestBody TransferRequest request) {
         return service.transfer(request);
     }
+
+    @PostMapping("add-transaction")
+    public ResponseEntity<?> addTransaction(@RequestBody AddTransactionRequest request) {
+        return service.addTransactionToAccount(request);
+    }
 }

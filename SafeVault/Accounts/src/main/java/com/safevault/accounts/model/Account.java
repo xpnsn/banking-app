@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Data
 @Entity(name = "accounts")
@@ -41,6 +44,8 @@ public class Account {
 
     private boolean isVerified;
 
+    private List<Long> transactionIds;
+
     public Account(String accountHolderName, AccountType accountType, Long userId, String pin) {
         this.accountHolderName = accountHolderName;
         this.accountType = accountType;
@@ -51,5 +56,6 @@ public class Account {
         this.isVerified = false;
         this.status = AccountStatus.INACTIVE;
         this.userId = userId;
+        this.transactionIds = Collections.emptyList();
     }
 }

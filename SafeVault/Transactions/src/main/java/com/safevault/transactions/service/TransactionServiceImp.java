@@ -1,6 +1,7 @@
 package com.safevault.transactions.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.safevault.transactions.dto.AddTransactionRequest;
 import com.safevault.transactions.dto.TransactionDto;
 import com.safevault.transactions.dto.TransactionRequest;
 import com.safevault.transactions.dto.UserDto;
@@ -11,6 +12,8 @@ import com.safevault.transactions.feignclient.AuthenticationFeignClient;
 import com.safevault.transactions.model.Transaction;
 import com.safevault.transactions.model.TransactionStatus;
 import com.safevault.transactions.model.TransactionType;
+import com.safevault.transactions.repository.TransactionRepository;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,19 +27,24 @@ public class TransactionServiceImp implements TransactionService {
     private final AccountsFeignClient accountsClient;
     private final TransactionDtoMapper dtoMapper;
     private final ObjectMapper objectMapper;
+    private final TransactionRepository transactionRepository;
 
-    public TransactionServiceImp(AuthenticationFeignClient authClient, AccountsFeignClient accountsClient, TransactionDtoMapper dtoMapper, ObjectMapper objectMapper) {
+    public TransactionServiceImp(AuthenticationFeignClient authClient, AccountsFeignClient accountsClient, TransactionDtoMapper dtoMapper, ObjectMapper objectMapper, TransactionRepository transactionRepository) {
         this.authClient = authClient;
         this.accountsClient = accountsClient;
         this.dtoMapper = dtoMapper;
         this.objectMapper = objectMapper;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
-    public ResponseEntity<?> initiateTransaction(TransactionRequest request, String userId) {
+    public ResponseEntity<?> initiateTransaction(TransactionRequest request) {
 
         UserDto userDto = objectMapper.convertValue(authClient.validate().getBody(), UserDto.class);
 
+        if(!userDto.accounts().contains(request.accountFrom())) {
+            return new ResponseEntity<>("Invalid account", HttpStatus.BAD_REQUEST);
+        }
         Transaction transaction = new Transaction(
                 request.accountFrom(),
                 request.accountTo(),
@@ -44,6 +52,7 @@ public class TransactionServiceImp implements TransactionService {
                 request.transactionType(),
                 TransactionStatus.PENDING
         );
+
         try {
             TransactionType type = request.transactionType();
 
@@ -80,15 +89,22 @@ public class TransactionServiceImp implements TransactionService {
 
             transaction.setStatus(TransactionStatus.SUCCEEDED);
             TransactionDto transactionDto = dtoMapper.apply(transaction);
-
+            transaction = transactionRepository.save(transaction);
+            Long transactionId = transaction.getTransactionId();
+            accountsClient.addTransaction(new AddTransactionRequest(
+                    request.accountFrom(),
+                    transactionId
+            ));
+            accountsClient.addTransaction(new AddTransactionRequest(
+                    request.accountTo(),
+                    transactionId
+            ));
             return new ResponseEntity<>(transactionDto, HttpStatus.OK);
 
+        } catch (FeignException.BadRequest e) {
+            return new ResponseEntity<>(e.contentUTF8(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            transaction.setStatus(TransactionStatus.FAILED);
-
-            TransactionDto transactionDto = dtoMapper.apply(transaction);
-
-            return new ResponseEntity<>(transactionDto, HttpStatus.OK);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -96,5 +112,7 @@ public class TransactionServiceImp implements TransactionService {
     public ResponseEntity<?> getAccount(Long id) {
         return accountsClient.getAccountById(id);
     }
+
+    
 
 }

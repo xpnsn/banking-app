@@ -16,8 +16,8 @@ public class TransactionController {
     }
 
     @PostMapping("initiate")
-    public ResponseEntity<?> initiateTransaction(@RequestBody TransactionRequest request, @RequestHeader("X-User-Id") String userId) {
-        return serviceImp.initiateTransaction(request, userId);
+    public ResponseEntity<?> initiateTransaction(@RequestBody TransactionRequest request) {
+        return serviceImp.initiateTransaction(request);
     }
 
     @GetMapping({"{id}"})

@@ -20,4 +20,5 @@ public interface AccountService {
     public ResponseEntity<?> verifyAccount(Long accountId);
     public void notInactiveAccount(Account account);
     public ResponseEntity<?> getAccountsByUserId(String userId);
+    ResponseEntity<?> addTransactionToAccount(AddTransactionRequest request);
 }

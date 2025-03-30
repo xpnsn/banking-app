@@ -192,4 +192,12 @@ public class AccountServiceImp implements AccountService {
         List<Account> allByUserId = repository.getAllByUserId(Long.valueOf(userId));
         return new ResponseEntity<>(allByUserId, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<?> addTransactionToAccount(AddTransactionRequest request) {
+        Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
+        account.getTransactionIds().add(request.TransactionId());
+        repository.save(account);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -1,5 +1,6 @@
 package com.safevault.transactions.feignclient;
 
+import com.safevault.transactions.dto.AddTransactionRequest;
 import com.safevault.transactions.dto.accounts.AccountDto;
 import com.safevault.transactions.dto.TransactionRequest;
 import com.safevault.transactions.dto.accounts.CreditDebitRequest;
@@ -22,4 +23,7 @@ public interface AccountsFeignClient {
 
     @PostMapping("api/v1/accounts/debit")
     public ResponseEntity<?> debitAccount(@RequestBody CreditDebitRequest request);
+
+    @PostMapping("api/v1/accounts/add-transaction")
+    public ResponseEntity<?> addTransaction(@RequestBody AddTransactionRequest request);
 }
