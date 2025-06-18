@@ -1,10 +1,12 @@
 package com.safevault.api_gateway.filter;
 
 import com.fasterxml.jackson.core.filter.TokenFilter;
+import com.safevault.api_gateway.feignclient.UserClient;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -51,8 +53,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         .setSigningKey(JWT_SECRET)
                         .build().parseClaimsJws(token);
                 Claims claims = claimsJws.getPayload();
-                boolean isVerified = claims.get("verified", Boolean.class);
                 userId = String.valueOf(claims.get("id", Object.class));
+                boolean isVerified = claims.get("verified", Boolean.class);
                 List<String> roles = ((List<?>) claims.get("roles", Object.class))
                         .stream()
                         .map(role -> (String) ((Map<?, ?>) role).get("authority"))

@@ -5,133 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="431bbe7e-5b55-4c6a-afd8-412714bb5a0e" name="Changes" comment="issue with ModelMapper">
-      <change afterPath="$PROJECT_DIR$/notifications/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notifications/src/main/java/com/safevault/notifications/config/EnvironmentConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/security/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/transactions/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/AccountsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/controller/AccountController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/controller/AdminController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountCreationRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountDeletionRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AccountDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/AddTransactionRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/CreditDebitRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/TransferRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/AccountNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/DuplicateAccountException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/InactiveAccountException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/IncorrectPinException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/InsufficientBalanceException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/exception/SuspendedAccountException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/feignClient/SecurityFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/filter/AuthFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/interceptor/FeignClientInterceptor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/model/Account.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/model/AccountStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/model/AccountType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/model/TransactionType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/repository/AccountRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountDtoMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/main/resources/banner.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Accounts/src/test/java/com/safevault/accounts/AccountsApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/src/main/java/com/safevault/api_gateway/ApiGatewayApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/src/main/java/com/safevault/api_gateway/filter/AuthenticationFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Api-Gateway/src/test/java/com/safevault/api_gateway/ApiGatewayApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/src/main/java/com/safevault/eureka_server/EurekaServerApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eureka-server/src/test/java/com/safevault/eureka_server/EurekaServerApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/src/main/java/com/safevault/notifications/NotificationsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notifications/src/test/java/com/safevault/notifications/NotificationsApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/SecurityApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/config/CorsConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/controller/AdminController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/controller/SecurityController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/dto/CustomUserDetails.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/dto/LoginRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/dto/RegistrationRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/entity/UserEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/filter/AuthFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/mapper/DtoMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/repository/UserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/service/AdminService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/service/AuthService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/service/CustomUserDetailsService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/service/JwtService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/java/com/safevault/security/service/impl/AdminServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Security/src/test/java/com/safevault/security/SecurityApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/TransactionsApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/controller/TransactionController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/AddTransactionRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/TransactionDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/TransactionRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/accounts/AccountDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/accounts/CreditDebitRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/dto/accounts/TransferRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/feignclient/AccountsFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/feignclient/AuthenticationFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/interceptor/FeignClientInterceptor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/model/AccountType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/model/Transaction.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/model/TransactionStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/model/TransactionType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/repository/TransactionRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/service/TransactionDtoMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/service/TransactionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/java/com/safevault/transactions/service/TransactionServiceImp.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/main/resources/banner.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Transactions/src/test/java/com/safevault/transactions/TransactionsApplicationTests.java" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Security/security.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/safevault/api_gateway/dto/UserDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/safevault/api_gateway/feignclient/UserClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/NotificationDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/entity/CustomErrorResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/exception/DuplicateResourceException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/service/KafkaProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/dto/AccountCreationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/dto/AccountCreationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/dto/AccountDeletionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/dto/AccountDeletionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/feignClient/SecurityFeignClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/feignClient/SecurityFeignClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/src/main/java/com/safevault/accounts/service/AccountServiceImp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/safevault/api_gateway/ApiGatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/safevault/api_gateway/ApiGatewayApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/safevault/api_gateway/filter/AuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/safevault/api_gateway/filter/AuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/security/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/controller/SecurityController.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/controller/SecurityController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/LoginRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/RegistrationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/RegistrationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/dto/UserDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/entity/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/entity/UserEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/mapper/DtoMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/mapper/DtoMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/java/com/safevault/security/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/security/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transactions/src/main/java/com/safevault/transactions/dto/TransactionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/transactions/src/main/java/com/safevault/transactions/dto/TransactionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transactions/src/main/java/com/safevault/transactions/exceptions/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/transactions/src/main/java/com/safevault/transactions/exceptions/GlobalExceptionHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,7 +83,7 @@
     "git-widget-placeholder": "main",
     "jdk.selected.JAVA_MODULE": "21",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/himanshu/Documents/intellij-workspace/banking-app/SafeVault/accounts",
+    "last_opened_file_path": "/home/himanshu/Documents/intellij-workspace/banking-app/SafeVault/eureka-server",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -247,6 +146,7 @@
       <workItem from="1730383272563" duration="1618000" />
       <workItem from="1730434245188" duration="100000" />
       <workItem from="1747239189780" duration="142000" />
+      <workItem from="1750167784163" duration="51000" />
     </task>
     <task id="LOCAL-00001" summary="issue with ModelMapper">
       <option name="closed" value="true" />

@@ -16,7 +16,7 @@ public interface SecurityFeignClient {
     public ResponseEntity<?> addAccountToUser(@RequestParam String accountId);
 
     @PostMapping("api/v1/security/remove-account-from-user")
-    public ResponseEntity<?> removeAccountFromUser(@RequestParam String accountId);
+    public ResponseEntity<?> removeAccountFromUser(@RequestParam String accountId, @RequestParam String password);
 
     @GetMapping(value = "api/v1/security/get-phone-number/{userId}")
     public ResponseEntity<?> getPhoneNumber(@PathVariable String userId);

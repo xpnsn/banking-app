@@ -3,6 +3,7 @@ package com.safevault.notifications.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.support.converter.JsonMessageConverter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,6 +37,11 @@ public class SecurityConfig {
         return username -> {
             throw new UsernameNotFoundException("UserDetailsService not Implemented!");
         };
+    }
+
+    @Bean
+    public JsonMessageConverter jsonMessageConverter() {
+        return new JsonMessageConverter();
     }
 
 }

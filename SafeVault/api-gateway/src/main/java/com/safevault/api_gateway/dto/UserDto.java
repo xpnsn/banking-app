@@ -1,6 +1,7 @@
-package com.safevault.security.dto;
+package com.safevault.api_gateway.dto;
 
 import java.util.List;
+
 public record UserDto(
     Long id,
     String username,
@@ -8,6 +9,6 @@ public record UserDto(
     String name,
     String email,
     List<String> roles,
-    List<Long> accounts,
-    boolean isVerified
-){}
+    List<Long> accounts
+) {
+}

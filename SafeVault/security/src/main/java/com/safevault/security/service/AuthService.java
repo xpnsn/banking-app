@@ -32,14 +32,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DtoMapper mapper;
+    private final KafkaProducer producer;
 
-    public AuthService(CustomUserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository, PasswordEncoder passwordEncoder, DtoMapper mapper) {
+    public AuthService(CustomUserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository, PasswordEncoder passwordEncoder, DtoMapper mapper, KafkaProducer producer) {
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
+        this.producer = producer;
     }
 
     public ResponseEntity<?> saveUser(RegistrationRequest user) {
@@ -105,7 +107,7 @@ public class AuthService {
         return userRepository.findById(Long.valueOf(id)).orElse(null);
     }
 
-    public ResponseEntity<String> addAccountToUser(String accountId, String password) {
+    public ResponseEntity<String> addAccountToUser(String accountId) {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
             UserEntity user = userRepository.findByUsername(name);
@@ -122,7 +124,10 @@ public class AuthService {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
             UserEntity user = userRepository.findByUsername(name);
-            if(user == null || accountId == null) {return new ResponseEntity<>("Invalid ID", HttpStatus.NOT_FOUND);}
+            if(user == null || accountId == null || !user.getAccountIds().contains(Long.valueOf(accountId))) {return new ResponseEntity<>("Invalid Account ID", HttpStatus.NOT_FOUND);}
+            if(!user.getPassword().equals(passwordEncoder.encode(password))) {
+                return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
+            }
             user.getAccountIds().remove(Long.valueOf(accountId));
             userRepository.save(user);
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
@@ -134,5 +139,12 @@ public class AuthService {
     public ResponseEntity<?> getPhoneNumber(String userId) {
         String phoneNumber = Objects.requireNonNull(userRepository.findById(Long.valueOf(userId)).orElse(null)).getPhoneNumber();
         return ResponseEntity.ok().body(new MessageResponse(phoneNumber));
+    }
+
+    public ResponseEntity<?> kafkaTest(String message) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepository.findByUsername(username);
+        producer.send(user.getPhoneNumber(), "SMS", message, 1);
+        return new ResponseEntity<>("SENT!", HttpStatus.OK);
     }
 }

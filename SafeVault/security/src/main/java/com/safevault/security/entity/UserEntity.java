@@ -15,7 +15,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
-@Entity(name = "Users")
+@Entity
+@Table(
+        name = "Users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username", name = "unique_username"),
+                @UniqueConstraint(columnNames = "phone_number", name = "unique_phone_number"),
+                @UniqueConstraint(columnNames = "email", name = "unique_email_constraint")
+        }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
@@ -27,8 +35,10 @@ public class UserEntity {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false, name = "phone_number")
     private String phoneNumber;
 
     @Column(nullable = false)
@@ -39,7 +49,6 @@ public class UserEntity {
 
     @Column(nullable = false)
     private List<String> roles;
-
 
     private Set<Long> accountIds = new HashSet<>();
 

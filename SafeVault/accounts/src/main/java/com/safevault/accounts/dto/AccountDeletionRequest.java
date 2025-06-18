@@ -16,6 +16,7 @@ public record AccountDeletionRequest(
     String pin,
 
     @NotEmpty(message = "Please enter the password")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"|,.<>/?]).*$", message = "Invalid Password")
     String password
 
 ) {}

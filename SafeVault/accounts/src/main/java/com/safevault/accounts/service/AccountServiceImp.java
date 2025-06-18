@@ -95,10 +95,13 @@ public class AccountServiceImp implements AccountService {
     public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) {
         try {
             Account account = repository.findById(accountDeletionRequest.accountId()).orElseThrow(AccountNotFoundException::new);
+            if(account.getPin() != accountDeletionRequest.pin()) {
+                return new ResponseEntity<>("Invalid Pin", HttpStatus.BAD_REQUEST);
+            }
             if(account.getBalance() > 1) {
                 return new ResponseEntity<>("You still have some funds in this account, try moving the funds before deleting the account!", HttpStatus.BAD_REQUEST);
             }
-            securityClient.removeAccountFromUser(accountDeletionRequest.accountId().toString());
+            securityClient.removeAccountFromUser(accountDeletionRequest.accountId().toString(), accountDeletionRequest.password());
             repository.deleteById(accountDeletionRequest.accountId());
 
         } catch (RuntimeException e) {

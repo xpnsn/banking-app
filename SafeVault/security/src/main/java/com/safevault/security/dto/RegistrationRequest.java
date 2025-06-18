@@ -5,6 +5,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegistrationRequest(
+
+    @NotEmpty(message = "The username must not be empty")
+    @Pattern(regexp = "^(?=.*[a-z])[a-z0-9_]+$", message = "The username must contain lowercase alphabets, and addition digits and underscore if required")
+    @Size(min = 4, max = 12, message = "The username must be between 4 to 12 characters only")
     String username,
 
     @NotEmpty(message = "The first name must not be empty")

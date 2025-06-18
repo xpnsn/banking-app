@@ -1,16 +1,16 @@
-package com.safevault.transactions.exceptions;
+package com.safevault.security.exception;
 
-import com.safevault.transactions.model.CustomErrorResponse;
+import com.safevault.security.entity.CustomErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -32,15 +32,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidTransactionType.class)
-    public ResponseEntity<?> handleInvalidTransactionType(InvalidTransactionType ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(
+                error -> errors.put(error.getField(), error.getDefaultMessage()));
         CustomErrorResponse response = new CustomErrorResponse(
-                "Invalid Transaction Type",
-                Map.of("error", ex.getMessage())
+                "Validation Error",
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                errors
         );
-
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<CustomErrorResponse> handleDuplicateResource(DuplicateResourceException ex) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                "Duplicate Resources",
+                HttpStatus.CONFLICT.value(),
+                LocalDateTime.now(),
+                Map.of("errors",ex.getCause().getMessage())
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomErrorResponse> handleGeneralException(Exception ex) {
