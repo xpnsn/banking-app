@@ -15,54 +15,54 @@ public class RedisRepository {
         this.redisTemplate = redisTemplate;
     }
 
-    public void saveOtp(String userId, String otp) {
-        String otpKey = "OTP:" + userId;
-        String retryKey = "RETRY:" + userId;
+    public void saveOtp(String userId, String otp, String type) {
+        String otpKey = "OTP:" + type + userId;
+        String retryKey = "RETRY:" + type + userId;
         redisTemplate.opsForValue().set(otpKey, otp, Duration.ofMinutes(5));
-        addCooldown(userId, 120);
+        addCooldown(userId, 120, type);
         redisTemplate.opsForValue().set(retryKey, "0", Duration.ofMinutes(10));
     }
 
-    public int retryCount(String userId) {
-        String retryKey = "RETRY:" + userId;
+    public int retryCount(String userId, String type) {
+        String retryKey = "RETRY:" + type + userId;
         String temp = Objects.requireNonNull(redisTemplate.opsForValue().get(retryKey)).toString();
         int attempt = Integer.parseInt(temp)+1;
         redisTemplate.opsForValue().set(retryKey, attempt + "");
         return attempt;
     }
 
-    public void resetRetryCount(String userId) {
-        redisTemplate.delete("RETRY:" + userId);
-        redisTemplate.delete("OTP:" + userId);
+    public void resetRetryCount(String userId, String type) {
+        redisTemplate.delete("RETRY:" + type + userId);
+        redisTemplate.delete("OTP:" +type + userId);
     }
 
-    public String getOtp(String userId) {
-        String key = "OTP:" + userId;
+    public String getOtp(String userId, String type) {
+        String key = "OTP:" + type + userId;
         return (String) redisTemplate.opsForValue().get(key);
     }
 
-    public void deleteOtp(String userId) {
-        String key = "OTP:" + userId;
+    public void deleteOtp(String userId, String type) {
+        String key = "OTP:" + type + userId;
         redisTemplate.delete(key);
     }
-    public boolean validForOpt(String userId) {
-        String key = "COOLDOWN:" + userId;
+    public boolean validForOpt(String userId, String type) {
+        String key = "COOLDOWN:" + type + userId;
         return !Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
-    public void clear(String userId) {
-        redisTemplate.delete("OTP:"+userId);
-        redisTemplate.delete("COOLDOWN:"+userId);
-        redisTemplate.delete("RETRY:"+userId);
+    public void clear(String userId, String type) {
+        redisTemplate.delete("OTP:"+type+userId);
+        redisTemplate.delete("COOLDOWN:"+type+userId);
+        redisTemplate.delete("RETRY:"+type+userId);
     }
 
-    public void addCooldown(String userId, long duration) {
-        String cooldownKey = "COOLDOWN:" + userId;
+    public void addCooldown(String userId, long duration, String type) {
+        String cooldownKey = "COOLDOWN:" + type + userId;
         redisTemplate.opsForValue().set(cooldownKey, "1", Duration.ofSeconds(duration));
     }
 
-    public String getTimeoutTime(String userId) {
-        String key = "COOLDOWN:" + userId;
+    public String getTimeoutTime(String userId, String type) {
+        String key = "COOLDOWN:" + type + userId;
         if(Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
             Long expire = redisTemplate.getExpire(key);
             Duration duration = Duration.ofSeconds(expire);

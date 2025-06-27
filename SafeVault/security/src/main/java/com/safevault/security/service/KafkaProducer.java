@@ -6,6 +6,8 @@ import com.safevault.security.dto.NotificationDto;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class KafkaProducer {
 
@@ -17,9 +19,9 @@ public class KafkaProducer {
         this.objectMapper = objectMapper;
     }
 
-    public void send(String to, String type, String message, int priority) {
+    public void send(String to, String type, Map<String, String> data, int priority) {
         try {
-            NotificationDto dto = new NotificationDto(to, type, message, priority);
+            NotificationDto dto = new NotificationDto(to, type, data, priority);
             String json = objectMapper.writeValueAsString(dto);
             kafkaTemplate.send("notification-topic", to, json);
         } catch (JsonProcessingException e) {

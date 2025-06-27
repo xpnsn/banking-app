@@ -4,8 +4,10 @@ import org.springframework.http.ResponseEntity;
 
 public interface RedisService {
 
-    ResponseEntity<?> generateOTP();
-    ResponseEntity<?> validateOtp(String otp);
+    ResponseEntity<?> generateSmsOTP();
+    ResponseEntity<?> generateEmailOTP();
+    ResponseEntity<?> validateSmsOtp(String otp);
+    ResponseEntity<?> validateEmailOtp(String otp);
 
     ResponseEntity<?> test(String userId, String body);
 }
