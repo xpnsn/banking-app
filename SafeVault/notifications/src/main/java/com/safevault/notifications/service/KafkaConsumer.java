@@ -11,10 +11,12 @@ import java.util.PriorityQueue;
 public class KafkaConsumer {
 
     private final TwilioService twilioService;
+    private final EmailService emailService;
     PriorityQueue<NotificationDto> queue = new PriorityQueue<>();
 
-    public KafkaConsumer(TwilioService twilioService) {
+    public KafkaConsumer(TwilioService twilioService, EmailService emailService) {
         this.twilioService = twilioService;
+        this.emailService = emailService;
     }
 
     @KafkaListener(
@@ -29,9 +31,11 @@ public class KafkaConsumer {
     private void process() {
         while(!queue.isEmpty()) {
             NotificationDto notificationDto = queue.poll();
-//            System.out.println("processing messages...");
-            twilioService.sendMessage(notificationDto.getSender(), notificationDto.getMessage());
-//            System.out.println("messages processed");
+            if(notificationDto.getType().equalsIgnoreCase("sms")) {
+                twilioService.sendMessage(notificationDto);
+            } else if (notificationDto.getType().equalsIgnoreCase("email")) {
+                emailService.sendMail(notificationDto);
+            }
         }
     }
 }

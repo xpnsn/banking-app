@@ -1,0 +1,1 @@
+A/c {{accountFrom}} debited Rs.{{amount}} on {{date}} to {{accountTo}}. Transaction id:{{transactionId}}

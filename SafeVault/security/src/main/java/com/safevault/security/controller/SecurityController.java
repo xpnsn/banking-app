@@ -40,12 +40,12 @@ public class SecurityController {
     }
 
     @PostMapping("/add-account-to-user")
-    public ResponseEntity<String> addAccountToUser(@RequestParam String accountId) {
+    public ResponseEntity<?> addAccountToUser(@RequestParam String accountId) {
         return authService.addAccountToUser(accountId);
     }
 
     @PostMapping("/remove-account-from-user")
-    public ResponseEntity<String> removeAccountFromUser(@RequestParam String accountId, @RequestParam String password) {
+    public ResponseEntity<?> removeAccountFromUser(@RequestParam String accountId, @RequestParam String password) {
         return authService.removeAccountFromUser(accountId, password);
     }
 
@@ -54,14 +54,24 @@ public class SecurityController {
         return authService.getPhoneNumber(userId);
     }
 
-    @GetMapping("/generate-otp")
-    public ResponseEntity<?> generateOTP() {
-        return redisService.generateOTP();
+    @GetMapping("/generate-otp/phone")
+    public ResponseEntity<?> generateSmsOTP() {
+        return redisService.generateSmsOTP();
     }
 
-    @PostMapping("/validate-otp/{otp}")
-    public ResponseEntity<?> validateOTP(@PathVariable String otp) {
-        return redisService.validateOtp(otp);
+    @PostMapping("/validate-otp/phone/{otp}")
+    public ResponseEntity<?> validateSmsOTP(@PathVariable String otp) {
+        return redisService.validateSmsOtp(otp);
+    }
+
+    @GetMapping("/generate-otp/email")
+    public ResponseEntity<?> generateEmailOTP() {
+        return redisService.generateEmailOTP();
+    }
+
+    @PostMapping("/validate-otp/email/{otp}")
+    public ResponseEntity<?> validateEmailOTP(@PathVariable String otp) {
+        return redisService.validateEmailOtp(otp);
     }
 
     @PostMapping("kafka")

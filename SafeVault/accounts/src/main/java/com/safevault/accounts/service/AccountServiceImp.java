@@ -17,9 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 
@@ -30,13 +29,15 @@ public class AccountServiceImp implements AccountService {
     private final SecurityFeignClient securityClient;
     private final ObjectMapper objectMapper;
     private final NotificationClient notificationClient;
+    private final KafkaProducer kafkaProducer;
 
-    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper, NotificationClient notificationClient) {
+    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper, NotificationClient notificationClient, KafkaProducer kafkaProducer) {
         this.repository = repository;
         this.mapper = mapper;
         this.securityClient = securityClient;
         this.objectMapper = objectMapper;
         this.notificationClient = notificationClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     @Override
@@ -78,9 +79,11 @@ public class AccountServiceImp implements AccountService {
             AccountDto accountDto = mapper.apply(account);
             ResponseEntity<?> responseEntity = securityClient.addAccountToUser(accountDto.accountId().toString());
             if(responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-                return new ResponseEntity<>("Your Account creation request has been received, You'll be able to access the account once your account is approved!", HttpStatus.CREATED);
+                String phoneNumber = objectMapper.convertValue(securityClient.getPhoneNumber(account.getUserId().toString()).getBody(), MessageResponse.class).value();
+                kafkaProducer.send(phoneNumber, "SMS", Collections.emptyMap(), 3);
+                return new ResponseEntity<>(HttpStatus.CREATED);
             } else {
-                repository.delete(account);
+                repository.deleteById(accountDto.userId());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
         } catch (IllegalArgumentException e) {
@@ -95,7 +98,7 @@ public class AccountServiceImp implements AccountService {
     public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) {
         try {
             Account account = repository.findById(accountDeletionRequest.accountId()).orElseThrow(AccountNotFoundException::new);
-            if(account.getPin() != accountDeletionRequest.pin()) {
+            if(!Objects.equals(account.getPin(), accountDeletionRequest.pin())) {
                 return new ResponseEntity<>("Invalid Pin", HttpStatus.BAD_REQUEST);
             }
             if(account.getBalance() > 1) {
@@ -133,14 +136,7 @@ public class AccountServiceImp implements AccountService {
     public ResponseEntity<?> debitAccount(CreditDebitRequest request){
         try {
             Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
-            notInactiveAccount(account);
-            if(!account.getPin().equals(request.pin())) {
-                throw new IncorrectPinException();
-            }
-            if(account.getBalance() < request.amount()) {
-                throw new InsufficientBalanceException();
-            }
-            account.setBalance(account.getBalance() - request.amount());
+            verifyInfo(account, account, request.pin(), request.amount());
             repository.save(account);
             AccountDto accountDto = mapper.apply(account);
             return new ResponseEntity<>(accountDto, HttpStatus.OK);
@@ -156,18 +152,23 @@ public class AccountServiceImp implements AccountService {
         Account accountFrom = repository.findById(request.accountFrom()).orElseThrow(AccountNotFoundException::new);
         Account accountTo = repository.findById(request.accountTo()).orElseThrow(AccountNotFoundException::new);
         notInactiveAccount(accountFrom);
-        notInactiveAccount(accountTo);
-        if(!accountFrom.getPin().equals(request.pin())) {
-            throw new IncorrectPinException();
-        }
-        if(accountFrom.getBalance() < request.amount()) {
-            throw new InsufficientBalanceException();
-        }
-        accountFrom.setBalance(accountFrom.getBalance() - request.amount());
+        verifyInfo(accountFrom, accountTo, request.pin(), request.amount());
         accountTo.setBalance(accountTo.getBalance() + request.amount());
         repository.save(accountFrom);
         repository.save(accountTo);
+
         return new ResponseEntity<>(accountFrom, HttpStatus.OK);
+    }
+
+    private void verifyInfo(Account accountFrom, Account accountTo, String pin, Double amount) {
+        notInactiveAccount(accountTo);
+        if(!accountFrom.getPin().equals(pin)) {
+            throw new IncorrectPinException();
+        }
+        if(accountFrom.getBalance() < amount) {
+            throw new InsufficientBalanceException();
+        }
+        accountFrom.setBalance(accountFrom.getBalance() - amount);
     }
 
     @Override
@@ -184,9 +185,12 @@ public class AccountServiceImp implements AccountService {
     @Override
     public ResponseEntity<?> verifyAccount(Long accountId) {
         Account account = repository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+        UserDto userDto = objectMapper.convertValue(securityClient.validate().getBody(), UserDto.class);
         account.setVerified(true);
         account.setStatus(AccountStatus.ACTIVE);
         repository.save(account);
+        kafkaProducer.send(userDto.phoneNumber(), "SMS", Map.of("id", accountId.toString()), 3);
+        kafkaProducer.send(userDto.email(), "EMAIL", Map.of("user", account.getAccountHolderName()), 3);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
@@ -211,7 +215,25 @@ public class AccountServiceImp implements AccountService {
         accountTo.getTransactionIds().add(transactionDto.id());
         MessageResponse debitPhoneNumber = objectMapper.convertValue(securityClient.getPhoneNumber(accountFrom.getUserId().toString()).getBody(), MessageResponse.class);
         MessageResponse creditPhoneNumber = objectMapper.convertValue(securityClient.getPhoneNumber(accountTo.getUserId().toString()).getBody(), MessageResponse.class);
-        notificationClient.sendCreditDebitMessages(creditPhoneNumber.value(), debitPhoneNumber.value(), transactionDto);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String date = transactionDto.timeStamp().format(formatter);
+        kafkaProducer.send(creditPhoneNumber.value(), "SMS", Map.of(
+                "amount", transactionDto.amount().toString(),
+                "accountTo", transactionDto.accountTo(),
+                "accountFrom", transactionDto.accountFrom(),
+                "date", date,
+                "transactionId", transactionDto.id().toString()
+                ), 1);
+        kafkaProducer.send(debitPhoneNumber.value(), "SMS", Map.of(
+                "amount", transactionDto.amount().toString(),
+                "accountTo", transactionDto.accountTo(),
+                "accountFrom", transactionDto.accountFrom(),
+                "date", date,
+                "transactionId", transactionDto.id().toString()
+        ), 1);
+
+//        kafkaProducer.send(debitPhoneNumber.value(), "SMS", debitMessage, 1);
+//        notificationClient.sendCreditDebitMessages(creditPhoneNumber.value(), debitPhoneNumber.value(), transactionDto);
         repository.save(accountTo);
         repository.save(accountFrom);
         return new ResponseEntity<>(HttpStatus.OK);

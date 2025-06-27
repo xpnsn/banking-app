@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Approved</title>
+    <style type="text/css">
+        /* Client-specific resets */
+        body, html {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100%;
+            width: 100% !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        /* Prevent WebKit resizing */
+        body {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        /* Email container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        /* Main content */
+        .content {
+            padding: 30px 20px;
+            color: #333333;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Success icon/message */
+        .success-message {
+            text-align: center;
+            margin: 20px 0 30px 0;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #10b981;
+            margin-bottom: 15px;
+        }
+
+        .next-steps {
+            background: #f5f7ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 25px 0;
+        }
+
+        /* CTA button */
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+            background: #f9f9f9;
+            border-top: 1px solid #eeeeee;
+        }
+
+        /* Responsive adjustments */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .cta-button {
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background: #f5f5f7;">
+<!-- Main email container -->
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #f5f5f7;">
+    <tr>
+        <td align="center" valign="top">
+            <table class="email-container" width="600" border="0" cellspacing="0" cellpadding="0">
+                <!-- Header -->
+                <tr>
+                    <td style="padding: 30px 20px 20px 20px; text-align: center;">
+                        <h1 style="margin: 0; color: #2563eb; font-size: 24px;">Account Approved</h1>
+                    </td>
+                </tr>
+
+                <!-- Content -->
+                <tr>
+                    <td class="content">
+                        <div class="success-message">
+                            <div class="success-icon">✓</div>
+                            <h2 style="margin: 0 0 10px 0; color: #10b981;">Your account is now ready!</h2>
+                            <p style="margin: 0;">You can now start transacting on our platform.</p>
+                        </div>
+
+                        <p>Dear <strong>{{user}}</strong>,</p>
+
+                        <p>We're pleased to inform you that your account with <strong>SafeVault</strong> has been successfully verified and approved for transactions.</p>
+
+                        <div class="next-steps">
+                            <h3 style="margin: 0 0 10px 0; font-size: 18px;">What's Next?</h3>
+                            <ul style="margin: 0; padding-left: 20px;">
+                                <li>Login to your account using your credentials</li>
+                                <li>Explore available services</li>
+                                <li>Start your first transaction</li>
+                            </ul>
+                        </div>
+
+                        <p style="text-align: center; margin: 25px 0;">
+                            <a href="https://example.com/login" class="cta-button" target="_blank">Go to Dashboard</a>
+                        </p>
+
+                        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+
+                        <p>Thank you for choosing us!</p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td class="footer" style="padding: 20px; text-align: center;">
+                        <p style="margin: 0 0 5px 0;">SafeVault</p>
+                        <p style="margin: 0 0 5px 0;">
+                            <a href="#" style="color: #666666; text-decoration: underline;">Help Center</a> |
+                            <a href="#" style="color: #666666; text-decoration: underline;">Contact Support</a>
+                        </p>
+                        <p style="margin: 0; font-size: 11px; color: #bbbbbb;">
+                            This is an automated message - please do not reply directly to this email.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

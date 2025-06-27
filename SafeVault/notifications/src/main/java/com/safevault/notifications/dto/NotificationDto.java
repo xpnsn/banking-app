@@ -2,10 +2,12 @@ package com.safevault.notifications.dto;
 
 import lombok.Getter;
 
+import java.util.Map;
+
 public class NotificationDto implements Comparable<NotificationDto> {
     private String sender;
     private String type;
-    private String message;
+    private Map<String, String> data;
     private int priority;
 
     public String getSender() {
@@ -16,8 +18,8 @@ public class NotificationDto implements Comparable<NotificationDto> {
         return type;
     }
 
-    public String getMessage() {
-        return message;
+    public Map<String, String> getData() {
+        return data;
     }
 
     public int getPriority() {

@@ -1,0 +1,1 @@
+Rs.{{amount}} credited to a/c {{accountTo}} on {{date}} by a/c {{accountFrom}}. Transaction id:{{transactionId}}

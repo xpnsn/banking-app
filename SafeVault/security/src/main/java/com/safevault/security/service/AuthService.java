@@ -50,7 +50,7 @@ public class AuthService {
                     null,
                     user.username(),
                     user.email(),
-                    user.phoneNumber(),
+                    "+91"+user.phoneNumber(),
                     user.firstName() + " " + user.lastName(),
                     passwordEncoder.encode(user.password()),
                     List.of("USER"),
@@ -59,7 +59,9 @@ public class AuthService {
                     false
             );
             userEntity = userRepository.save(userEntity);
-            return new ResponseEntity<>(mapper.apply(userEntity), HttpStatus.OK);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.username());
+            String jwtToken = jwtService.generateToken(userDetails);
+            return new ResponseEntity<>(jwtToken, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -90,11 +92,6 @@ public class AuthService {
         }
     }
 
-    public UserDto getUser(String username) {
-        UserEntity user = userRepository.findByUsername(username);
-        return mapper.apply(user);
-    }
-
     public ResponseEntity<?> getUser() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity user = userRepository.findByUsername(name);
@@ -107,30 +104,30 @@ public class AuthService {
         return userRepository.findById(Long.valueOf(id)).orElse(null);
     }
 
-    public ResponseEntity<String> addAccountToUser(String accountId) {
+    public ResponseEntity<?> addAccountToUser(String accountId) {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
             UserEntity user = userRepository.findByUsername(name);
-            if(user == null || accountId == null) {return new ResponseEntity<>("Invalid ID", HttpStatus.NOT_FOUND);}
+            if(user == null || accountId == null) {return new ResponseEntity<>(new MessageResponse("INVALID ID"), HttpStatus.NOT_FOUND);}
             user.getAccountIds().add(Long.valueOf(accountId));
             userRepository.save(user);
-            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+            return new ResponseEntity<>(new MessageResponse("SUCCESS"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    public ResponseEntity<String> removeAccountFromUser(String accountId, String password) {
+    public ResponseEntity<?> removeAccountFromUser(String accountId, String password) {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
             UserEntity user = userRepository.findByUsername(name);
             if(user == null || accountId == null || !user.getAccountIds().contains(Long.valueOf(accountId))) {return new ResponseEntity<>("Invalid Account ID", HttpStatus.NOT_FOUND);}
             if(!user.getPassword().equals(passwordEncoder.encode(password))) {
-                return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(new MessageResponse("Invalid password"), HttpStatus.UNAUTHORIZED);
             }
             user.getAccountIds().remove(Long.valueOf(accountId));
             userRepository.save(user);
-            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+            return new ResponseEntity<>(new MessageResponse("SUCCESS"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -144,7 +141,7 @@ public class AuthService {
     public ResponseEntity<?> kafkaTest(String message) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity user = userRepository.findByUsername(username);
-        producer.send(user.getPhoneNumber(), "SMS", message, 1);
+//        producer.send(user.getPhoneNumber(), "SMS", message, 1);
         return new ResponseEntity<>("SENT!", HttpStatus.OK);
     }
 }

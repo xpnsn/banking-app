@@ -1,5 +1,6 @@
 package com.safevault.notifications.controller;
 
+import com.safevault.notifications.dto.NotificationDto;
 import com.safevault.notifications.dto.transations.TransactionDto;
 import com.safevault.notifications.service.TwilioService;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,10 @@ public class TwilioController {
         this.service = service;
     }
 
-    @PostMapping("send/{phoneNumber}/{body}")
-    public ResponseEntity<?> sendMessage(@PathVariable String phoneNumber, @PathVariable String body) {
-        return service.sendMessage(phoneNumber, body);
+    @PostMapping("send/sms")
+    public ResponseEntity<?> sendMessage(@RequestBody NotificationDto notificationDto) {
+        service.sendMessage(notificationDto);
+        return ResponseEntity.ok("SENT!");
     }
 
     @PostMapping("credit-debit-message")
