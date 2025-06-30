@@ -50,7 +50,7 @@ public class RedisServiceImpl implements RedisService {
             otp.append(random.nextInt(10));
         }
 //        notificationClient.sendMessage(userEntity.getPhoneNumber(), otp.toString());
-        kafkaProducer.send(userEntity.getPhoneNumber(), "SMS", Map.of("otp", otp.toString()), 2);
+        kafkaProducer.send(userEntity.getPhoneNumber(), "SMS", Map.of("otp", otp.toString(), "type", "otp"), 2);
         redisRepository.saveOtp(userId, otp.toString(), "SMS");
         return ResponseEntity.ok("OTP SENT!");
     }
@@ -95,7 +95,7 @@ public class RedisServiceImpl implements RedisService {
             otp.append(random.nextInt(10));
         }
 //        notificationClient.sendMessage(userEntity.getPhoneNumber(), otp.toString());
-        kafkaProducer.send(userEntity.getPhoneNumber(), "EMAIL", Map.of("otp", otp.toString()), 2);
+        kafkaProducer.send(userEntity.getEmail(), "EMAIL", Map.of("otp", otp.toString(), "type", "otp"), 2);
         redisRepository.saveOtp(userId, otp.toString(), "EMAIL");
         return ResponseEntity.ok("OTP SENT!");
     }
@@ -109,7 +109,7 @@ public class RedisServiceImpl implements RedisService {
             return ResponseEntity.badRequest().body("GENERATE NEW OTP!");
         }
         if(otp.equals(redisRepository.getOtp(userId, "EMAIL"))) {
-            userEntity.setVerifiedPhoneNumber(true);
+            userEntity.setVerifiedEmailAddress(true);
             userRepository.save(userEntity);
             redisRepository.clear(userId, "EMAIL");
             return ResponseEntity.ok("OTP VERIFIED!");

@@ -67,7 +67,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         .header("X-Username", claims.getSubject())
                         .build();
 
-                if(path.equals("/api/v1/security/generate-otp") || path.startsWith("/api/v1/security/validate-otp")) {
+                if(path.contains("generate-otp") || path.contains("validate-otp")) {
                     return chain.filter(exchange.mutate().request(request).build());
                 }
                 if(!isVerified) throw new RuntimeException("User not verified");
