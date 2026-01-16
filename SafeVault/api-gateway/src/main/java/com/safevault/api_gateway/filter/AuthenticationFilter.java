@@ -1,12 +1,8 @@
 package com.safevault.api_gateway.filter;
 
-import com.fasterxml.jackson.core.filter.TokenFilter;
-import com.safevault.api_gateway.feignclient.UserClient;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -41,6 +37,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         return (exchange, chain) -> {
             String path = exchange.getRequest().getPath().toString();
             ServerHttpRequest request = exchange.getRequest();
+            if (path.contains("/v3/api-docs")
+                    || path.contains("/swagger-ui")
+                    || path.contains("/swagger-ui.html")) {
+                return chain.filter(exchange);
+            }
             if(path.equals("/api/v1/security/login")||path.equals("/api/v1/security/register")) {
                 request = exchange.getRequest().mutate().header("X-Secret-Key", SECRET_KEY).build();
                 return chain.filter(exchange.mutate().request(request).build());

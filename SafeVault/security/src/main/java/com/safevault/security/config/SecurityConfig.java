@@ -37,11 +37,18 @@ public class SecurityConfig{
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/security/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(
-                            req -> secretKey.equals(req.getHeader("X-Secret-Key"))
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         ).permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/v1/security/**").permitAll()
+                        .requestMatchers("/api/v1/security/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(req ->
+                                secretKey.equals(req.getHeader("X-Secret-Key"))
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -1,9 +1,13 @@
 spring:
+
   application:
     name: Api-Gateway
   cloud:
     gateway:
       routes:
+
+        # SERVICE ROUTES  
+
         - id: security-service
           uri: lb://SECURITY
           predicates:
@@ -31,15 +35,86 @@ spring:
             - Path=/api/v1/transactions/**
           filters:
             - AuthenticationFilter
+
+        # SWAGGER ROUTES
+
+        - id: security-swagger
+          uri: lb://SECURITY
+          predicates:
+            - Path=/security/v3/api-docs
+          filters:
+            - RewritePath=/security/(?<segment>.*), /$\{segment}
+
+        - id: notification-swagger
+          uri: lb://NOTIFICATIONS
+          predicates:
+            - Path=/notifications/v3/api-docs
+          filters:
+            - RewritePath=/notifications/(?<segment>.*), /$\{segment}
+
+        - id: account-swagger
+          uri: lb://ACCOUNTS
+          predicates:
+            - Path=/accounts/v3/api-docs
+          filters:
+            - RewritePath=/accounts/(?<segment>.*), /$\{segment}
+
+        - id: transaction-swagger
+          uri: lb://TRANSACTIONS
+          predicates:
+            - Path=/transactions/v3/api-docs
+          filters:
+            - RewritePath=/transactions/(?<segment>.*), /$\{segment}
+
 server:
+  servlet:
+    context-path:
   port: 8765
 jwt:
   secret:${JWT_SECRET}
 secret:
   key:${SECRET_KEY}
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    urls:
+      - name: Security Service
+        url: /security/v3/api-docs
+      - name: Notification Service
+        url: /notifications/v3/api-docs
+      - name: Account Service
+        url: /accounts/v3/api-docs
+      - name: Transaction Service
+        url: /transactions/v3/api-docs
+
 
 eureka:
+  instance:
+    hostname: ${EUREKA_HOST}
+    prefer-ip-address: ${ENABLE_IP}
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+
+logging:
+  level:
+    root: INFO
+
+    # Spring Cloud Gateway routing
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.route: DEBUG
+    org.springframework.cloud.gateway.handler: DEBUG
+
+    # Springdoc / Swagger
+    org.springdoc: DEBUG
+    org.springdoc.webflux: DEBUG
+
+    # WebFlux & Netty
+    org.springframework.web.reactive: DEBUG
+    reactor.netty: DEBUG
+
+    # Static resources (VERY IMPORTANT for Swagger UI)
+    org.springframework.web.server.adapter: DEBUG
