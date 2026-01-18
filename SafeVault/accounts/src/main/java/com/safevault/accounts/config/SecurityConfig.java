@@ -34,6 +34,11 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(
+                                "/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers("api/v1/accounts/admin/**").hasAuthority("ADMIN")
                         .requestMatchers(
                                 req -> secretKey.equals(req.getHeader("X-Secret-Key"))

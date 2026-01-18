@@ -4,17 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safevault.accounts.dto.*;
 import com.safevault.accounts.dto.transactions.TransactionDto;
 import com.safevault.accounts.exception.*;
-import com.safevault.accounts.feignClient.NotificationClient;
 import com.safevault.accounts.feignClient.SecurityFeignClient;
 import com.safevault.accounts.model.Account;
 import com.safevault.accounts.model.AccountStatus;
 import com.safevault.accounts.model.AccountType;
 import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -28,15 +24,13 @@ public class AccountServiceImp implements AccountService {
     private final AccountDtoMapper mapper;
     private final SecurityFeignClient securityClient;
     private final ObjectMapper objectMapper;
-    private final NotificationClient notificationClient;
     private final KafkaProducer kafkaProducer;
 
-    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper, NotificationClient notificationClient, KafkaProducer kafkaProducer) {
+    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper, KafkaProducer kafkaProducer) {
         this.repository = repository;
         this.mapper = mapper;
         this.securityClient = securityClient;
         this.objectMapper = objectMapper;
-        this.notificationClient = notificationClient;
         this.kafkaProducer = kafkaProducer;
     }
 
@@ -48,6 +42,10 @@ public class AccountServiceImp implements AccountService {
     @Override
     public ResponseEntity<?> getAccountById(Long id) {
         try {
+            UserDto user = objectMapper.convertValue(securityClient.validate().getBody(), UserDto.class);
+            if(!user.accounts().contains(id)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
             Account account = repository.findById(id).orElseThrow(AccountNotFoundException::new);
             AccountDto accountDto = mapper.apply(account);
             return new ResponseEntity<>(accountDto, HttpStatus.OK);
@@ -55,6 +53,7 @@ public class AccountServiceImp implements AccountService {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
     @Override
     public ResponseEntity<?> addAccount(AccountCreationRequest accountCreationRequest, String userId) {
         Account account = null;
@@ -232,8 +231,6 @@ public class AccountServiceImp implements AccountService {
                 "transactionId", transactionDto.id().toString()
         ), 1);
 
-//        kafkaProducer.send(debitPhoneNumber.value(), "SMS", debitMessage, 1);
-//        notificationClient.sendCreditDebitMessages(creditPhoneNumber.value(), debitPhoneNumber.value(), transactionDto);
         repository.save(accountTo);
         repository.save(accountFrom);
         return new ResponseEntity<>(HttpStatus.OK);

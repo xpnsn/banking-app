@@ -25,11 +25,16 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers(
-                        req -> secretKey.equals(req.getHeader("X-Secret-Key"))
-                    )
-                        .permitAll()
-                        .anyRequest().denyAll()
+                .authorizeHttpRequests(request -> request
+                    .requestMatchers(
+                            "/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html"
+                    ).permitAll()
+                    .requestMatchers(req ->
+                            secretKey.equals(req.getHeader("X-Secret-Key"))
+                    ).permitAll()
+                    .anyRequest().denyAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
