@@ -1,9 +1,9 @@
 package com.safevault.security.service.impl;
 
+import com.safevault.security.dto.ApiMessageResponse;
 import com.safevault.security.entity.UserEntity;
 import com.safevault.security.repository.UserRepository;
 import com.safevault.security.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,9 +27,10 @@ public class AdminServiceImpl implements AdminService {
             roles.add("ADMIN");
             user.setRoles(roles);
             userRepository.save(user);
-            return new ResponseEntity<>("UPDATED!", HttpStatus.OK);
+            return ResponseEntity.ok(ApiMessageResponse.of("UPDATED!", HttpStatus.OK));
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiMessageResponse.of(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
     }
 
@@ -42,9 +43,10 @@ public class AdminServiceImpl implements AdminService {
             roles.remove("ADMIN");
             user.setRoles(roles);
             userRepository.save(user);
-            return new ResponseEntity<>("UPDATED!", HttpStatus.OK);
+            return ResponseEntity.ok(ApiMessageResponse.of("UPDATED!", HttpStatus.OK));
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiMessageResponse.of(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
 
     }

@@ -19,12 +19,6 @@ public class AccountController {
         this.service = service;
     }
 
-    @Operation(summary = "Account details")
-    @GetMapping("id/{id}")
-    public ResponseEntity<?> getAccountById(@PathVariable Long id) {
-        return service.getAccountById(id);
-    }
-
     @Operation(summary = "Create Account")
     @PostMapping()
     public ResponseEntity<?> createAccount(
@@ -32,6 +26,12 @@ public class AccountController {
             @RequestHeader("X-User-Id") String userId
     ) {
         return service.addAccount(accountCreationRequest, userId);
+    }
+
+    @Operation(summary = "Get Account Details")
+    @PostMapping("details")
+    public ResponseEntity<?> getAccountDetails(@Valid @RequestBody AccountDetailRequest accountDetailRequest) {
+        return service.getAccountDetails(accountDetailRequest);
     }
 
     @Operation(summary = "Delete Account")

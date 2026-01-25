@@ -23,6 +23,12 @@ public class AdminController {
         return "test";
     }
 
+    @Operation(summary = "Get Account by ID")
+    @GetMapping("id/{accountId}")
+    public ResponseEntity<?> getAccountById(@PathVariable Long accountId) {
+        return accountService.getAccountById(accountId);
+    }
+
     @Operation(summary = "Get unverified accounts")
     @GetMapping("unverified-accounts")
     public ResponseEntity<?> getUnverifiedAccounts() {

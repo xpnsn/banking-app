@@ -11,6 +11,7 @@ import com.safevault.accounts.model.AccountType;
 import com.safevault.accounts.repository.AccountRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -25,13 +26,15 @@ public class AccountServiceImp implements AccountService {
     private final SecurityFeignClient securityClient;
     private final ObjectMapper objectMapper;
     private final KafkaProducer kafkaProducer;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper, KafkaProducer kafkaProducer) {
+    public AccountServiceImp(AccountRepository repository, AccountDtoMapper mapper, SecurityFeignClient securityClient, ObjectMapper objectMapper, KafkaProducer kafkaProducer, BCryptPasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.mapper = mapper;
         this.securityClient = securityClient;
         this.objectMapper = objectMapper;
         this.kafkaProducer = kafkaProducer;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -72,14 +75,14 @@ public class AccountServiceImp implements AccountService {
                     user.name(),
                     AccountType.valueOf(accountCreationRequest.accountType()),
                     Long.valueOf(userId),
-                    accountCreationRequest.pin()
+                    passwordEncoder.encode(accountCreationRequest.pin())
             );
             repository.save(account);
             AccountDto accountDto = mapper.apply(account);
             ResponseEntity<?> responseEntity = securityClient.addAccountToUser(accountDto.accountId().toString());
             if(responseEntity.getStatusCode().equals(HttpStatus.OK)) {
                 String phoneNumber = objectMapper.convertValue(securityClient.getPhoneNumber(account.getUserId().toString()).getBody(), MessageResponse.class).value();
-                kafkaProducer.send(phoneNumber, "SMS", Collections.emptyMap(), 3);
+                kafkaProducer.send(phoneNumber, "SMS", Map.of("type", "creation"), 3);
                 return new ResponseEntity<>(HttpStatus.CREATED);
             } else {
                 repository.deleteById(accountDto.userId());
@@ -97,21 +100,24 @@ public class AccountServiceImp implements AccountService {
     public ResponseEntity<?> removeAccount(AccountDeletionRequest accountDeletionRequest) {
         try {
             Account account = repository.findById(accountDeletionRequest.accountId()).orElseThrow(AccountNotFoundException::new);
-            if(!Objects.equals(account.getPin(), accountDeletionRequest.pin())) {
-                return new ResponseEntity<>("Invalid Pin", HttpStatus.BAD_REQUEST);
+            if(!Objects.equals(account.getPin(), passwordEncoder.encode(accountDeletionRequest.pin()))) {
+                throw new IncorrectPinException();
             }
             if(account.getBalance() > 1) {
-                return new ResponseEntity<>("You still have some funds in this account, try moving the funds before deleting the account!", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(ApiMessageResponse.of(
+                        "You still have some funds in this account, try moving the funds before deleting the account!",
+                        HttpStatus.BAD_REQUEST
+                ), HttpStatus.BAD_REQUEST);
             }
             securityClient.removeAccountFromUser(accountDeletionRequest.accountId().toString(), accountDeletionRequest.password());
             repository.deleteById(accountDeletionRequest.accountId());
 
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(ApiMessageResponse.of(e.getMessage(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(ApiMessageResponse.of(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Account Removed!", HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ApiMessageResponse.of("Account Removed!", HttpStatus.NO_CONTENT), HttpStatus.NO_CONTENT);
     }
 
     @Override
@@ -119,7 +125,7 @@ public class AccountServiceImp implements AccountService {
         try {
             Account account = repository.findById(request.accountId()).orElseThrow(AccountNotFoundException::new);
             notInactiveAccount(account);
-            if(!account.getPin().equals(request.pin()) && !isTypeTransfer) {
+            if(!account.getPin().equals(passwordEncoder.encode(request.pin())) && !isTypeTransfer) {
                 throw new IncorrectPinException();
             }
             account.setBalance(account.getBalance() + request.amount());
@@ -161,7 +167,7 @@ public class AccountServiceImp implements AccountService {
 
     private void verifyInfo(Account accountFrom, Account accountTo, String pin, Double amount) {
         notInactiveAccount(accountTo);
-        if(!accountFrom.getPin().equals(pin)) {
+        if(!accountFrom.getPin().equals(passwordEncoder.encode(pin))) {
             throw new IncorrectPinException();
         }
         if(accountFrom.getBalance() < amount) {
@@ -177,7 +183,7 @@ public class AccountServiceImp implements AccountService {
 
     @Override
     public ResponseEntity<?> getUnverifiedAccounts() {
-        List<Account> unverifiedAccounts = repository.findAll().stream().filter(account -> !account.isVerified()).toList();
+        List<AccountDto> unverifiedAccounts = repository.findAll().stream().filter(account -> !account.isVerified()).map(mapper).toList();
         return new ResponseEntity<>(unverifiedAccounts, HttpStatus.OK);
     }
 
@@ -188,9 +194,9 @@ public class AccountServiceImp implements AccountService {
         account.setVerified(true);
         account.setStatus(AccountStatus.ACTIVE);
         repository.save(account);
-        kafkaProducer.send(userDto.phoneNumber(), "SMS", Map.of("id", accountId.toString()), 3);
-        kafkaProducer.send(userDto.email(), "EMAIL", Map.of("user", account.getAccountHolderName()), 3);
-        return new ResponseEntity<>(account, HttpStatus.OK);
+        kafkaProducer.send(userDto.phoneNumber(), "SMS", Map.of("id", accountId.toString(), "type", "approval"), 3);
+        kafkaProducer.send(userDto.email(), "EMAIL", Map.of("user", account.getAccountHolderName(), "type", "approval"), 3);
+        return new ResponseEntity<>(mapper.apply(account), HttpStatus.OK);
     }
 
     @Override
@@ -221,18 +227,30 @@ public class AccountServiceImp implements AccountService {
                 "accountTo", transactionDto.accountTo(),
                 "accountFrom", transactionDto.accountFrom(),
                 "date", date,
-                "transactionId", transactionDto.id().toString()
+                "transactionId", transactionDto.id().toString(),
+                "type", "credit"
                 ), 1);
         kafkaProducer.send(debitPhoneNumber.value(), "SMS", Map.of(
                 "amount", transactionDto.amount().toString(),
                 "accountTo", transactionDto.accountTo(),
                 "accountFrom", transactionDto.accountFrom(),
                 "date", date,
-                "transactionId", transactionDto.id().toString()
+                "transactionId", transactionDto.id().toString(),
+                "type", "debit"
         ), 1);
 
         repository.save(accountTo);
         repository.save(accountFrom);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> getAccountDetails(AccountDetailRequest accountDetailRequest) {
+        Account account = repository.findById(accountDetailRequest.accountId()).orElseThrow(AccountNotFoundException::new);
+        if(!account.getPin().equals(passwordEncoder.encode(accountDetailRequest.pin()))) {
+            throw new IncorrectPinException();
+        }
+        AccountDto accountDto = mapper.apply(account);
+        return new ResponseEntity<>(accountDto, HttpStatus.OK);
     }
 }

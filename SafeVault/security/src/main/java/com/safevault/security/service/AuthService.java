@@ -1,5 +1,6 @@
 package com.safevault.security.service;
 
+import com.safevault.security.dto.ApiMessageResponse;
 import com.safevault.security.dto.LoginRequest;
 import com.safevault.security.dto.MessageResponse;
 import com.safevault.security.dto.RegistrationRequest;
@@ -63,20 +64,23 @@ public class AuthService {
             String jwtToken = jwtService.generateToken(userDetails);
             return new ResponseEntity<>(jwtToken, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiMessageResponse.of(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
     }
 
     public ResponseEntity<?> validate(String authHeader) {
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return new ResponseEntity<>("Invalid token", HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiMessageResponse.of("Invalid token", HttpStatus.UNAUTHORIZED));
         }
         String token = authHeader.substring(7);
         if(jwtService.validateToken(token)) {
-            return new ResponseEntity<>("VALID", HttpStatus.OK);
+            return ResponseEntity.ok(ApiMessageResponse.of("VALID", HttpStatus.OK));
         }
-        return new ResponseEntity<>("INVALID", HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiMessageResponse.of("INVALID", HttpStatus.UNAUTHORIZED));
 
     }
 
@@ -88,7 +92,8 @@ public class AuthService {
             String jwtToken = jwtService.generateToken(userDetails);
             return new ResponseEntity<>(jwtToken, HttpStatus.OK);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>("BAD CREDENTIALS", HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiMessageResponse.of("BAD CREDENTIALS", HttpStatus.UNAUTHORIZED));
         }
     }
 
@@ -142,6 +147,6 @@ public class AuthService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity user = userRepository.findByUsername(username);
 //        producer.send(user.getPhoneNumber(), "SMS", message, 1);
-        return new ResponseEntity<>("SENT!", HttpStatus.OK);
+        return ResponseEntity.ok(ApiMessageResponse.of("SENT!", HttpStatus.OK));
     }
 }

@@ -1,5 +1,6 @@
 package com.safevault.security.service.impl;
 
+import com.safevault.security.dto.ApiMessageResponse;
 import com.safevault.security.entity.UserEntity;
 import com.safevault.security.feignClient.NotificationClient;
 import com.safevault.security.repository.RedisRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class RedisServiceImpl implements RedisService {
@@ -38,11 +38,12 @@ public class RedisServiceImpl implements RedisService {
         String name = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         UserEntity userEntity = userRepository.findByUsername(name);
         if(userEntity.getVerifiedPhoneNumber()) {
-            return ResponseEntity.badRequest().body("PHONE NUMBER ALREADY VERIFIED!");
+            return ResponseEntity.badRequest().body(ApiMessageResponse.of("PHONE NUMBER ALREADY VERIFIED!", HttpStatus.BAD_REQUEST));
         }
         String userId = String.valueOf(userEntity.getId());
         if(!redisRepository.validForOpt(userId, "SMS")) {
-            return new ResponseEntity<>("TIMEOUT OF "+redisRepository.getTimeoutTime(userId, "SMS"), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiMessageResponse.of("TIMEOUT OF "+redisRepository.getTimeoutTime(userId, "SMS"), HttpStatus.BAD_REQUEST));
         }
         SecureRandom random = new SecureRandom();
         StringBuilder otp = new StringBuilder();
@@ -52,7 +53,7 @@ public class RedisServiceImpl implements RedisService {
 //        notificationClient.sendMessage(userEntity.getPhoneNumber(), otp.toString());
         kafkaProducer.send(userEntity.getPhoneNumber(), "SMS", Map.of("otp", otp.toString(), "type", "otp"), 2);
         redisRepository.saveOtp(userId, otp.toString(), "SMS");
-        return ResponseEntity.ok("OTP SENT!");
+        return ResponseEntity.ok(ApiMessageResponse.of("OTP SENT!", HttpStatus.OK));
     }
 
     @Override
@@ -61,20 +62,20 @@ public class RedisServiceImpl implements RedisService {
         UserEntity userEntity = userRepository.findByUsername(name);
         String userId = String.valueOf(userEntity.getId());
         if(redisRepository.getOtp(userId, "SMS") == null) {
-            return ResponseEntity.badRequest().body("GENERATE NEW OTP!");
+            return ResponseEntity.badRequest().body(ApiMessageResponse.of("GENERATE NEW OTP!", HttpStatus.BAD_REQUEST));
         }
         if(otp.equals(redisRepository.getOtp(userId, "SMS"))) {
             userEntity.setVerifiedPhoneNumber(true);
             userRepository.save(userEntity);
             redisRepository.clear(userId, "SMS");
-            return ResponseEntity.ok("OTP VERIFIED!");
+            return ResponseEntity.ok(ApiMessageResponse.of("OTP VERIFIED!", HttpStatus.OK));
         } else {
             int l = redisRepository.retryCount(userId, "SMS");
             if(l > 5) {
                 redisRepository.addCooldown(userId, 3600, "SMS");
                 redisRepository.resetRetryCount(userId, "SMS");
             }
-            return ResponseEntity.badRequest().body("INVALID OTP!");
+            return ResponseEntity.badRequest().body(ApiMessageResponse.of("INVALID OTP!", HttpStatus.BAD_REQUEST));
         }
     }
 
@@ -83,11 +84,12 @@ public class RedisServiceImpl implements RedisService {
         String name = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         UserEntity userEntity = userRepository.findByUsername(name);
         if(userEntity.getVerifiedEmailAddress()) {
-            return ResponseEntity.badRequest().body("EMAIL ALREADY VERIFIED!");
+            return ResponseEntity.badRequest().body(ApiMessageResponse.of("EMAIL ALREADY VERIFIED!", HttpStatus.BAD_REQUEST));
         }
         String userId = String.valueOf(userEntity.getId());
         if(!redisRepository.validForOpt(userId, "EMAIL")) {
-            return new ResponseEntity<>("TIMEOUT OF "+redisRepository.getTimeoutTime(userId, "EMAIL"), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiMessageResponse.of("TIMEOUT OF "+redisRepository.getTimeoutTime(userId, "EMAIL"), HttpStatus.BAD_REQUEST));
         }
         SecureRandom random = new SecureRandom();
         StringBuilder otp = new StringBuilder();
@@ -97,7 +99,7 @@ public class RedisServiceImpl implements RedisService {
 //        notificationClient.sendMessage(userEntity.getPhoneNumber(), otp.toString());
         kafkaProducer.send(userEntity.getEmail(), "EMAIL", Map.of("otp", otp.toString(), "type", "otp"), 2);
         redisRepository.saveOtp(userId, otp.toString(), "EMAIL");
-        return ResponseEntity.ok("OTP SENT!");
+        return ResponseEntity.ok(ApiMessageResponse.of("OTP SENT!", HttpStatus.OK));
     }
 
     @Override
@@ -106,20 +108,20 @@ public class RedisServiceImpl implements RedisService {
         UserEntity userEntity = userRepository.findByUsername(name);
         String userId = String.valueOf(userEntity.getId());
         if(redisRepository.getOtp(userId, "EMAIL") == null) {
-            return ResponseEntity.badRequest().body("GENERATE NEW OTP!");
+            return ResponseEntity.badRequest().body(ApiMessageResponse.of("GENERATE NEW OTP!", HttpStatus.BAD_REQUEST));
         }
         if(otp.equals(redisRepository.getOtp(userId, "EMAIL"))) {
             userEntity.setVerifiedEmailAddress(true);
             userRepository.save(userEntity);
             redisRepository.clear(userId, "EMAIL");
-            return ResponseEntity.ok("OTP VERIFIED!");
+            return ResponseEntity.ok(ApiMessageResponse.of("OTP VERIFIED!", HttpStatus.OK));
         } else {
             int l = redisRepository.retryCount(userId, "EMAIL");
             if(l > 5) {
                 redisRepository.addCooldown(userId, 3600, "EMAIL");
                 redisRepository.resetRetryCount(userId, "EMAIL");
             }
-            return ResponseEntity.badRequest().body("INVALID OTP!");
+            return ResponseEntity.badRequest().body(ApiMessageResponse.of("INVALID OTP!", HttpStatus.BAD_REQUEST));
         }
     }
 

@@ -22,4 +22,5 @@ public interface AccountService {
     public void notInactiveAccount(Account account);
     public ResponseEntity<?> getAccountsByUserId(String userId);
     ResponseEntity<?> addTransactionToAccount(TransactionDto transactionDto);
+    ResponseEntity<?> getAccountDetails(AccountDetailRequest accountDetailRequest);
 }
