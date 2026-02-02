@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/notifications")
-public class TwilioController {
+public class NotificationController {
 
 
     private final TwilioService service;
 
-    public TwilioController(TwilioService service) {
+    public NotificationController(TwilioService service) {
         this.service = service;
     }
 
